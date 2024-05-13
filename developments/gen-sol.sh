@@ -12,7 +12,7 @@ done
 for f in ${ABI_PATH}/*.abi; do
   p=$(echo $f | sed -r 's/\.[^.]*$//')
   name=$(echo $p | sed -r 's:.*/::')
-  abigen --abi $f --pkg abi --type $name --out $p.go
+  abigen --abi $f --bin ${p}.bin --pkg abi --type $name --out $p.go
 done
 
 #! remove permission

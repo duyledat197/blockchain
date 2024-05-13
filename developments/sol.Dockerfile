@@ -5,5 +5,5 @@ ENV GO111MODULE=on
 RUN go install github.com/ethereum/go-ethereum/cmd/abigen@latest
 
 #* main stage
-FROM ethereum/solc:0.8.19-alpine AS gen-contract
+FROM ethereum/solc:0.8.24 AS gen-contract
 COPY --from=build-stage /usr/local/bin/. /usr/local/bin/.
