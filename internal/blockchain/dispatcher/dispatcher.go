@@ -4,13 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"log/slog"
+	"time"
 
 	"be-earning/blockchain/pkg/eth"
 	"be-earning/blockchain/pkg/iface/pubsub"
 )
 
 type Dispatcher interface {
-	pubsub.Subscriber
+	Subscribe(ctx context.Context, topic string, msg *pubsub.Pack, tt time.Time)
 }
 
 type defaultDispatcher struct {
@@ -18,7 +19,7 @@ type defaultDispatcher struct {
 }
 
 func NewDispatcher(client *eth.EthClient) Dispatcher {
-	return defaultDispatcher{
+	return &defaultDispatcher{
 		client: client,
 	}
 }
@@ -27,9 +28,15 @@ func (d *defaultDispatcher) Dispatch(ctx context.Context, tx *DispatcherTxReques
 	return d.client.Transfer(ctx, tx.PrivKey, tx.From, tx.To, tx.Amount)
 }
 
-func (d *defaultDispatcher) Subscribe(ctx context.Context, _ string, data []byte) {
+func (d *defaultDispatcher) Subscribe(ctx context.Context, topic string, msg *pubsub.Pack, timestamp time.Time) {
+	slog.Info("received tx",
+		slog.String("topic", topic),
+		slog.Time("timestamp", timestamp),
+		slog.String("value", string(msg.Msg)),
+		slog.String("key", string(msg.Key)),
+	)
 	var tx DispatcherTxRequest
-	if err := json.Unmarshal(data, &tx); err != nil {
+	if err := json.Unmarshal(msg.Msg, &tx); err != nil {
 		slog.Error("failed to unmarshal tx", slog.Any("err", err))
 		return
 	}

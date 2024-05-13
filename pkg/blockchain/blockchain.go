@@ -1,6 +1,6 @@
 package blockchain
 
-import "be-earning/blockchain/pkg/block"
+import "be-earning/blockchain/pkg/blockchain/block"
 
 type Blockchain struct {
 	blocks []*block.Block

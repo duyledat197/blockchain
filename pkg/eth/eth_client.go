@@ -15,7 +15,7 @@ import (
 	"github.com/ethereum/go-ethereum/rpc"
 
 	abi "be-earning/blockchain/idl"
-	"be-earning/blockchain/pkg/block"
+	"be-earning/blockchain/pkg/blockchain/block"
 )
 
 type EthClient struct {

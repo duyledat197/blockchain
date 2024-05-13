@@ -5,7 +5,7 @@ import (
 	"math"
 	"math/big"
 
-	"be-earning/blockchain/pkg/block"
+	"be-earning/blockchain/pkg/blockchain/block"
 	"be-earning/blockchain/util"
 )
 

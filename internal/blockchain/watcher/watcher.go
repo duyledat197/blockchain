@@ -100,5 +100,6 @@ func (w *defaultWatcher) migrate(ctx context.Context) error {
 	for _, evLog := range evLogs {
 		w.handleEventLog(evLog)
 	}
+
 	return nil
 }
