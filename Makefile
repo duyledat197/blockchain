@@ -10,6 +10,8 @@ gen-mock:
 compose:
 	docker compose -f ${COMPOSE} up -d --build
 deploy-contract:
-	PRIVATE_KEY="8378c4e4383b0ae04a815eb57208e4512aba0e5a9d0badcded84efef05dd98d7" CHAIN_URL="http://localhost:8545" go run deployments/contract/main.go
+	 go run main.go deployContract
 get-accounts:
-	docker compose -f ${COMPOSE} exec -it ganache ganache-cli --wallet.accounts 
+	docker compose -f ${COMPOSE} logs ganache
+start-gateway:
+	go run main.go gateway

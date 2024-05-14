@@ -19,7 +19,7 @@ services:
       - zookeeper
 
   ganache:
-    image: trufflesuite/ganache-cli:latest
+    image: trufflesuite/ganache:latest
     ports:
       - "8545:8545"
       - "7545:7545"

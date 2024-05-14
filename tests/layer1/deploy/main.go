@@ -1,5 +1,0 @@
-package deploy
-
-func main() {
-	
-}

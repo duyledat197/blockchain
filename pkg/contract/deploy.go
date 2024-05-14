@@ -8,7 +8,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 
-	abi "openmyth/blockchain/idl/contracts"
+	contract "openmyth/blockchain/idl/contracts"
 	"openmyth/blockchain/pkg/eth"
 )
 
@@ -33,7 +33,7 @@ func DeployMyTokenContract(ctx context.Context, client *eth.EthClient, privKey *
 		return nil, fmt.Errorf("failed to create transactor: %v", err)
 	}
 
-	contractAddr, _, _, err := abi.DeployMyToken(txOpts, client.Client, "MyToken", "MTK", 18)
+	contractAddr, _, _, err := contract.DeployMyToken(txOpts, client.Client, "MyToken", "MTK", 18)
 	if err != nil {
 		return nil, fmt.Errorf("failed to deploy contract: %v", err)
 	}

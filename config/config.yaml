@@ -1,0 +1,10 @@
+private_key: "78eb697ef7340bdd6e29a3102e51557478d04c0e658f32277af11ba2fbcc0dda"
+eth_client: 
+  host: "http://localhost"
+  port: "8545"
+gateway_service:
+  host: ""
+  port: "5000"
+user_service:
+  host: ""
+  port: "5001"

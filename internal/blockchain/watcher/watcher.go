@@ -74,11 +74,11 @@ func (w *defaultWatcher) Stop(_ context.Context) error {
 //
 // It takes a types.Log parameter named evLog and returns an error.
 func (w *defaultWatcher) handleEventLog(evLog types.Log) {
-	approval, err := w.client.Erc20.ParseApproval(evLog)
+	approval, err := w.client.Contract.ParseApproval(evLog)
 	if err == nil && approval != nil {
 		// TODO: Handle approval
 	}
-	transfer, err := w.client.Erc20.ParseTransfer(evLog)
+	transfer, err := w.client.Contract.ParseTransfer(evLog)
 	if err == nil && transfer != nil {
 		// TODO: Handle transfer
 	}

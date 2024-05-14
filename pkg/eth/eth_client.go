@@ -21,14 +21,14 @@ import (
 type EthClient struct {
 	Client          IClient
 	ContractAddress common.Address
-	Erc20           *api.ERC20
+	Contract        *api.MyToken
 	rpcClient       *rpc.Client
 }
 
 // NewEthClient initializes a new Ethereum client.
 func NewEthClient(client IClient) *EthClient {
 	contractAddr := common.HexToAddress(os.Getenv("CONTRACT_ADDRESS"))
-	erc20Contract, err := api.NewERC20(contractAddr, client)
+	contract, err := api.NewMyToken(contractAddr, client)
 	if err != nil {
 		log.Fatalf("unable to create ERC20 instance: %v", err)
 	}
@@ -36,7 +36,7 @@ func NewEthClient(client IClient) *EthClient {
 	return &EthClient{
 		Client:          client,
 		ContractAddress: contractAddr,
-		Erc20:           erc20Contract,
+		Contract:        contract,
 	}
 }
 
@@ -101,7 +101,7 @@ func (c *EthClient) Transfer(ctx context.Context, privKey, fromAddr, toAdrr stri
 	fromAddress := common.HexToAddress(fromAddr)
 	toAddress := common.HexToAddress(toAdrr)
 
-	tx, err := c.Erc20.TransferFrom(&bind.TransactOpts{
+	tx, err := c.Contract.TransferFrom(&bind.TransactOpts{
 		From: fromAddress,
 		Signer: func(a common.Address, t *types.Transaction) (*types.Transaction, error) {
 			chainID, err := c.Client.ChainID(ctx)
@@ -118,11 +118,10 @@ func (c *EthClient) Transfer(ctx context.Context, privKey, fromAddr, toAdrr stri
 		},
 	}, fromAddress, toAddress, amount)
 
-	slog.Info("tx hash", slog.Any("tx hash", tx.Hash().Hex()))
-
 	if err != nil {
 		return err
 	}
+	slog.Info("tx hash", slog.Any("tx hash", tx.Hash().Hex()))
 
 	return nil
 }

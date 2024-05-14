@@ -4,12 +4,12 @@ import "fmt"
 
 // Database represents the configuration details for a database connection.
 type Database struct {
-	Host          string
-	Port          string
-	User          string
-	Password      string
-	Database      string
-	MaxConnection int32
+	Host          string `mapstructure:"host,omitempty"`
+	Port          string `mapstructure:"port,omitempty"`
+	User          string `mapstructure:"user,omitempty"`
+	Password      string `mapstructure:"password,omitempty"`
+	Database      string `mapstructure:"database,omitempty"`
+	MaxConnection int32  `mapstructure:"max_connection,omitempty"`
 }
 
 // Address returns the formatted string for the database connection address.
