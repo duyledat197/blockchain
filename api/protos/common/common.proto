@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package common;
+option go_package = "openmyth/blockchain/idl/pb/common";
+
+message User {
+  string username = 1;
+  string id = 2;
+}

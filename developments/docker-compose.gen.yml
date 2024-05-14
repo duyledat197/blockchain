@@ -23,6 +23,8 @@ services:
       - "../api/protos:/app/api/protos"
       - "../idl:/app/idl"
       - "./gen-proto.sh:/app/gen-proto.sh"
+      - "../docs:/app/docs"
+      - "../idl/pb:/proto_out/openmyth/blockchain/idl/pb"
     entrypoint: sh /app/gen-proto.sh
 
   generate_mock:

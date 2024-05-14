@@ -14,7 +14,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/rpc"
 
-	abi "openmyth/blockchain/idl"
+	abi "openmyth/blockchain/idl/contracts"
 	"openmyth/blockchain/pkg/blockchain/block"
 )
 

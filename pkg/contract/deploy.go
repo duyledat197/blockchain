@@ -8,7 +8,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 
-	abi "openmyth/blockchain/idl"
+	abi "openmyth/blockchain/idl/contracts"
 	"openmyth/blockchain/pkg/eth"
 )
 
