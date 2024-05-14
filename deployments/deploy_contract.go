@@ -5,11 +5,10 @@ import (
 	"log"
 	"os"
 
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/crypto"
 
-	abi "be-earning/blockchain/idl"
-	"be-earning/blockchain/pkg/eth"
+	"openmyth/blockchain/pkg/contract"
+	"openmyth/blockchain/pkg/eth"
 )
 
 func main() {
@@ -19,6 +18,7 @@ func main() {
 	env := os.Getenv("ENV")
 	privateKey := os.Getenv("PRIVATE_KEY")
 	chainURL := os.Getenv("CHAIN_URL")
+
 	switch env {
 	case "dev", "local":
 		client = eth.NewSimulatedClient()
@@ -26,26 +26,17 @@ func main() {
 		client = eth.NewDialClient(chainURL)
 	}
 
-	ethClient := eth.NewEthClient(client)
-
-	chainID, err := ethClient.Client.ChainID(ctx)
-	if err != nil {
-		log.Fatalf("failed to get chainID: %v", err)
-	}
-
 	importedPrivateKey, err := crypto.HexToECDSA(privateKey)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	txOpts, err := bind.NewKeyedTransactorWithChainID(importedPrivateKey, chainID)
+	ethClient := eth.NewEthClient(client)
+
+	contractAddress, err := contract.DeployMyTokenContract(ctx, ethClient, importedPrivateKey)
 	if err != nil {
-		log.Fatal(err)
-	}
-	contractAddr, _, _, err := abi.DeployMyToken(txOpts, ethClient.Client, "MyToken", "MTK", 18)
-	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to deploy contract: %v", err)
 	}
 
-	log.Println("Contract address:", contractAddr.Hex())
+	log.Println("Contract address:", contractAddress.Hex())
 }

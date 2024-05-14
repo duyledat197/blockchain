@@ -1,0 +1,33 @@
+version: "3.4"
+
+services:
+  generate_contract:
+    image: gen-contract
+    build:
+      context: ..
+      target: gen-contract
+      dockerfile: ./developments/sol.Dockerfile
+    volumes:
+      - "../api/sols:/app/api/sols"
+      - "./gen-sol.sh:/app/gen-sol.sh"
+      - "../idl:/app/idl"
+    entrypoint: sh /app/gen-sol.sh
+
+  generate_proto:
+    image: gen-proto
+    build:
+      context: ../
+      target: gen-proto
+      dockerfile: ./developments/proto.Dockerfile
+    volumes:
+      - "../api/protos:/app/api/protos"
+      - "../idl:/app/idl"
+      - "./gen-proto.sh:/app/gen-proto.sh"
+    entrypoint: sh /app/gen-proto.sh
+
+  generate_mock:
+    image: vektra/mockery
+    working_dir: /code
+    volumes:
+      - "../:/code:cached"
+    command: [ "--all", "--dir", "internal", "--case", "underscore" ]

@@ -14,8 +14,8 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/rpc"
 
-	abi "be-earning/blockchain/idl"
-	"be-earning/blockchain/pkg/blockchain/block"
+	abi "openmyth/blockchain/idl"
+	"openmyth/blockchain/pkg/blockchain/block"
 )
 
 type EthClient struct {
@@ -46,16 +46,16 @@ func NewEthClient(client IClient) *EthClient {
 // It returns a pointer to a block.Block struct, which contains information about the latest block,
 // or an error if the retrieval fails.
 func (c *EthClient) RetrieveLatestBlock(ctx context.Context) (*block.Block, error) {
-	info, err := c.Client.BlockByNumber(ctx, nil)
+	lastestBlock, err := c.Client.BlockByNumber(ctx, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get latest block: %w", err)
 	}
 	return &block.Block{
-		Index:         info.Number().Uint64(),
-		Timestamp:     int64(info.Time()),
-		PrevBlockHash: info.ParentHash().Bytes(),
-		Hash:          info.Hash().Bytes(),
-		Nonce:         int64(info.Nonce()),
+		Index:         lastestBlock.Number().Uint64(),
+		Timestamp:     int64(lastestBlock.Time()),
+		PrevBlockHash: lastestBlock.ParentHash().Bytes(),
+		Hash:          lastestBlock.Hash().Bytes(),
+		Nonce:         int64(lastestBlock.Nonce()),
 	}, nil
 }
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-CONTRACT_PATH=/app/contracts
-ABI_PATH=/app/idl
+CONTRACT_PATH=/app/api/sols
+ABI_PATH=/app/idl/contracts
 
 # solc --help
 for f in ${CONTRACT_PATH}/*.sol; do
@@ -12,7 +12,7 @@ done
 for f in ${ABI_PATH}/*.abi; do
   p=$(echo $f | sed -r 's/\.[^.]*$//')
   name=$(echo $p | sed -r 's:.*/::')
-  abigen --abi $f --bin ${p}.bin --pkg abi --type $name --out $p.go
+  abigen --abi $f --bin ${p}.bin --pkg contract --type $name --out $p.go
 done
 
 #! remove permission

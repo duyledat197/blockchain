@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package user;
+option go_package = "openmyth/messgener/pb/user";
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+import "user/common.proto";
+
+service AuthService {
+  rpc Login(LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post : "/v1/auth/login"
+      body : "*"
+    };
+  };
+
+  rpc Register(RegisterRequest) returns (RegisterResponse) {
+    option (google.api.http) = {
+      post : "/v1/auth/register"
+      body : "*"
+    };
+  };
+}
+
+message RegisterRequest {
+  string username = 1 [ (validate.rules).string = {min_len : 4, max_len : 20} ];
+  string password = 2 [ (validate.rules).string = {min_len : 6, max_len : 20} ];
+  string repeat_password = 3
+      [ (validate.rules).string = {min_len : 6, max_len : 20} ];
+}
+
+message RegisterResponse {}
+
+message LoginRequest {
+  string username = 1 [ (validate.rules).string = {min_len : 4, max_len : 20} ];
+  string password = 2 [ (validate.rules).string = {min_len : 6, max_len : 20} ];
+}
+
+message LoginResponse {
+  User user = 1;
+  string token = 2;
+}
