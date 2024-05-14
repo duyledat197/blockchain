@@ -13,9 +13,9 @@ import (
 )
 
 type userRepository struct {
-	mgoClient *mongoclient.MongoClient
-
-	collection *mongo.Collection
+	databaseName string
+	mgoClient    *mongoclient.MongoClient
+	collection   *mongo.Collection
 }
 
 // NewUserRepository creates a new instance of the UserRepository interface.
@@ -23,13 +23,18 @@ type userRepository struct {
 // It takes a *mongoclient.MongoClient and a string representing the database name as parameters.
 // It returns a *userRepository implementing the UserRepository interface.
 func NewUserRepository(mgoClient *mongoclient.MongoClient, databaseName string) repositories.UserRepository {
-	e := &entities.User{}
-	collection := mgoClient.Database(databaseName).Collection(e.TableName())
-
 	return &userRepository{
-		mgoClient:  mgoClient,
-		collection: collection,
+		databaseName: databaseName,
+		mgoClient:    mgoClient,
 	}
+}
+func (r *userRepository) getCollection() *mongo.Collection {
+	if r.collection == nil {
+		e := &entities.User{}
+		r.collection = r.mgoClient.Database(r.databaseName).Collection(e.TableName())
+	}
+
+	return r.collection
 }
 
 // Create inserts a new user into the user repository.
@@ -37,7 +42,7 @@ func NewUserRepository(mgoClient *mongoclient.MongoClient, databaseName string) 
 // It takes a context.Context and a pointer to an entities.User as parameters.
 // It returns an error if there was a problem inserting the user.
 func (r *userRepository) Create(ctx context.Context, data *entities.User) error {
-	res, err := r.collection.InsertOne(ctx, data)
+	res, err := r.getCollection().InsertOne(ctx, data)
 	if err != nil {
 		return err
 	}
@@ -56,7 +61,7 @@ func (r *userRepository) Create(ctx context.Context, data *entities.User) error 
 func (r *userRepository) FindUser(ctx context.Context, id string) (*entities.User, error) {
 	var result entities.User
 
-	if err := r.collection.FindOne(ctx, &entities.User{
+	if err := r.getCollection().FindOne(ctx, &entities.User{
 		ID: id,
 	}).Decode(&result); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -76,7 +81,7 @@ func (r *userRepository) FindUser(ctx context.Context, id string) (*entities.Use
 func (r *userRepository) FindUserByUsername(ctx context.Context, username string) (*entities.User, error) {
 	var result entities.User
 
-	if err := r.collection.FindOne(ctx, &entities.User{
+	if err := r.getCollection().FindOne(ctx, &entities.User{
 		UserName: username,
 	}).Decode(&result); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {

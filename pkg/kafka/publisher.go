@@ -18,7 +18,7 @@ type publisher struct {
 
 func NewPublisher(
 	clientID string,
-	brokerAddrs []string,
+	brokerAddrs ...string,
 ) pubsub.Publisher {
 	config := sarama.NewConfig()
 	config.ClientID = clientID

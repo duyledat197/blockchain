@@ -8,35 +8,36 @@ import (
 	"math/big"
 	"os"
 
+	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/rpc"
 
-	api "openmyth/blockchain/idl/contracts"
+	contract "openmyth/blockchain/idl/contracts"
+	"openmyth/blockchain/internal/contract/repositories"
 	"openmyth/blockchain/pkg/blockchain/block"
+	"openmyth/blockchain/pkg/eth_client"
 )
 
-type EthClient struct {
-	Client          IClient
-	ContractAddress common.Address
-	Contract        *api.MyToken
-	rpcClient       *rpc.Client
+type MyTokenRepo struct {
+	client          eth_client.IClient
+	contractAddress common.Address
+	contract        *contract.MyToken
 }
 
-// NewEthClient initializes a new Ethereum client.
-func NewEthClient(client IClient) *EthClient {
+// NewMyTokenRepository initializes a new Ethereum client.
+func NewMyTokenRepository(client eth_client.IClient) repositories.MyTokenRepo {
 	contractAddr := common.HexToAddress(os.Getenv("CONTRACT_ADDRESS"))
-	contract, err := api.NewMyToken(contractAddr, client)
+	contract, err := contract.NewMyToken(contractAddr, client)
 	if err != nil {
 		log.Fatalf("unable to create ERC20 instance: %v", err)
 	}
 
-	return &EthClient{
-		Client:          client,
-		ContractAddress: contractAddr,
-		Contract:        contract,
+	return &MyTokenRepo{
+		client:          client,
+		contractAddress: contractAddr,
+		contract:        contract,
 	}
 }
 
@@ -45,8 +46,8 @@ func NewEthClient(client IClient) *EthClient {
 // It takes a context.Context as a parameter to handle cancellation and timeouts.
 // It returns a pointer to a block.Block struct, which contains information about the latest block,
 // or an error if the retrieval fails.
-func (c *EthClient) RetrieveLatestBlock(ctx context.Context) (*block.Block, error) {
-	lastestBlock, err := c.Client.BlockByNumber(ctx, nil)
+func (c *MyTokenRepo) RetrieveLatestBlock(ctx context.Context) (*block.Block, error) {
+	lastestBlock, err := c.client.BlockByNumber(ctx, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get latest block: %w", err)
 	}
@@ -68,8 +69,8 @@ func (c *EthClient) RetrieveLatestBlock(ctx context.Context) (*block.Block, erro
 // Returns:
 // - uint64: The balance of the specified address.
 // - error: An error if the retrieval fails.
-func (c *EthClient) RetrieveBalanceOf(ctx context.Context, address string) (uint64, error) {
-	balance, err := c.Client.BalanceAt(ctx, common.HexToAddress(address), nil)
+func (c *MyTokenRepo) RetrieveBalanceOf(ctx context.Context, address string) (uint64, error) {
+	balance, err := c.client.BalanceAt(ctx, common.HexToAddress(address), nil)
 	if err != nil {
 		return 0, fmt.Errorf("failed to get balance: %w", err)
 	}
@@ -85,7 +86,7 @@ func (c *EthClient) RetrieveBalanceOf(ctx context.Context, address string) (uint
 // - toAddr: The address to which the transaction is sent.
 // - amount: The amount of cryptocurrency to send in the transaction.
 // Return type: error, indicating any error that occurred during the transaction.
-func (c *EthClient) Transfer(ctx context.Context, privKey, fromAddr, toAdrr string, amount *big.Int) error {
+func (c *MyTokenRepo) Transfer(ctx context.Context, privKey, fromAddr, toAdrr string, amount *big.Int) error {
 	privateKey, err := crypto.HexToECDSA(privKey)
 	if err != nil {
 		return err
@@ -101,10 +102,10 @@ func (c *EthClient) Transfer(ctx context.Context, privKey, fromAddr, toAdrr stri
 	fromAddress := common.HexToAddress(fromAddr)
 	toAddress := common.HexToAddress(toAdrr)
 
-	tx, err := c.Contract.TransferFrom(&bind.TransactOpts{
+	tx, err := c.contract.TransferFrom(&bind.TransactOpts{
 		From: fromAddress,
 		Signer: func(a common.Address, t *types.Transaction) (*types.Transaction, error) {
-			chainID, err := c.Client.ChainID(ctx)
+			chainID, err := c.client.ChainID(ctx)
 			if err != nil {
 				return nil, err
 			}
@@ -124,4 +125,24 @@ func (c *EthClient) Transfer(ctx context.Context, privKey, fromAddr, toAdrr stri
 	slog.Info("tx hash", slog.Any("tx hash", tx.Hash().Hex()))
 
 	return nil
+}
+
+func (c *MyTokenRepo) GetContractAddress() common.Address {
+	return c.contractAddress
+}
+
+func (c *MyTokenRepo) SubscribeFilterLogs(ctx context.Context, q ethereum.FilterQuery, ch chan<- types.Log) (ethereum.Subscription, error) {
+	return c.client.SubscribeFilterLogs(ctx, q, ch)
+}
+
+func (c *MyTokenRepo) FilterLogs(ctx context.Context, q ethereum.FilterQuery) ([]types.Log, error) {
+	return c.client.FilterLogs(ctx, q)
+}
+
+func (c *MyTokenRepo) ParseApproval(log types.Log) (*contract.MyTokenApproval, error) {
+	return c.contract.ParseApproval(log)
+}
+
+func (c *MyTokenRepo) ParseTransfer(log types.Log) (*contract.MyTokenTransfer, error) {
+	return c.contract.ParseTransfer(log)
 }

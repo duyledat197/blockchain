@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"time"
 
-	"openmyth/blockchain/pkg/eth"
+	"openmyth/blockchain/internal/contract/repositories"
 	"openmyth/blockchain/pkg/iface/pubsub"
 )
 
@@ -15,17 +15,17 @@ type Dispatcher interface {
 }
 
 type defaultDispatcher struct {
-	client *eth.EthClient
+	myTokenRepo repositories.MyTokenRepo
 }
 
-func NewDispatcher(client *eth.EthClient) Dispatcher {
+func NewDispatcher(myTokenRepo repositories.MyTokenRepo) Dispatcher {
 	return &defaultDispatcher{
-		client: client,
+		myTokenRepo: myTokenRepo,
 	}
 }
 
 func (d *defaultDispatcher) Dispatch(ctx context.Context, tx *DispatcherTxRequest) error {
-	return d.client.Transfer(ctx, tx.PrivKey, tx.From, tx.To, tx.Amount)
+	return d.myTokenRepo.Transfer(ctx, tx.PrivKey, tx.From, tx.To, tx.Amount)
 }
 
 func (d *defaultDispatcher) Subscribe(ctx context.Context, topic string, msg *pubsub.Pack, timestamp time.Time) {

@@ -2,17 +2,11 @@ package gateway
 
 import (
 	"context"
-	"log"
-	"log/slog"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
+	"net/http"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/lmittmann/tint"
 
-	"openmyth/blockchain/config"
+	"openmyth/blockchain/html"
 	userPb "openmyth/blockchain/idl/pb/user"
 	"openmyth/blockchain/pkg/grpc_client"
 	"openmyth/blockchain/pkg/http_server"
@@ -20,44 +14,25 @@ import (
 )
 
 type Server struct {
-	cfg *config.Config
-
 	userClient userPb.UserServiceClient
 	authClient userPb.AuthServiceClient
 
-	factories  []processor.Factory
-	processors []processor.Processor
+	service *processor.Service
 }
 
-func (s *Server) loadConfig() {
-	s.cfg = config.LoadConfig()
-}
-
-func (s *Server) loadLogger() {
-	var slogHandler slog.Handler
-	switch os.Getenv("ENV") {
-	case "prod", "stg":
-		f, err := os.OpenFile("./logs/deploy_contract.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-		if err != nil {
-			log.Fatalf("unable to open log file output: %v", err)
-		}
-		slogHandler = slog.NewJSONHandler(f, nil)
-	default:
-		slogHandler = tint.NewHandler(os.Stdout, nil)
+func NewServer() *Server {
+	return &Server{
+		service: processor.NewService(),
 	}
-
-	logger := slog.New(slogHandler)
-
-	slog.SetDefault(logger)
 }
 
 func (s *Server) loadClients() {
-	userConn := grpc_client.NewGrpcClient(s.cfg.UserService)
+	userConn := grpc_client.NewGrpcClient(s.service.Cfg.UserService)
 
 	s.userClient = userPb.NewUserServiceClient(userConn)
 	s.authClient = userPb.NewAuthServiceClient(userConn)
 
-	s.factories = append(s.factories, userConn)
+	s.service.WithFactories(userConn)
 }
 
 func (s *Server) loadServer(ctx context.Context) {
@@ -66,67 +41,25 @@ func (s *Server) loadServer(ctx context.Context) {
 		userPb.RegisterAuthServiceHandlerClient(ctx, mux, s.authClient)
 		userPb.RegisterUserServiceHandlerClient(ctx, mux, s.userClient)
 
-	}, s.cfg.GatewayService)
+		mux.HandlePath(http.MethodGet, "/home", func(w http.ResponseWriter, r *http.Request, pathParams map[string]string) {
+			// w.WriteHeader(http.StatusOK)
+			w.Header().Set("Content-Type", "text/html")
 
-	s.processors = append(s.processors, srv)
+			// http.ServeFile(w, r, "./html/index.html")
+			http.ServeFileFS(w, r, html.Pages, "index.html")
+		})
+
+	}, s.service.Cfg.GatewayService)
+
+	s.service.WithProcessors(srv)
 }
 
 func (s *Server) Run(ctx context.Context) {
-	s.loadConfig()
-	s.loadLogger()
+	s.service.LoadLogger()
+	s.service.LoadConfig()
+
 	s.loadClients()
 	s.loadServer(ctx)
 
-	s.gracefulShutdown(ctx)
-}
-
-func (s *Server) gracefulShutdown(ctx context.Context) {
-	errChan := make(chan error)
-	signChan := make(chan os.Signal, 1)
-
-	for _, f := range s.factories {
-		if err := f.Connect(ctx); err != nil {
-			errChan <- err
-		}
-	}
-
-	for _, p := range s.processors {
-		go func(p processor.Processor) {
-			if err := p.Start(ctx); err != nil {
-				errChan <- err
-
-			}
-		}(p)
-	}
-
-	signal.Notify(signChan, os.Interrupt, syscall.SIGTERM)
-
-	select {
-	case _ = <-errChan:
-		s.stop(ctx)
-	case <-signChan:
-		log.Println("Shutting down...")
-		s.stop(ctx, true)
-
-	}
-}
-
-// stop stops the server gracefully by closing all factories and starting all processors.
-func (s *Server) stop(ctx context.Context, graceful ...bool) {
-	for _, p := range s.processors {
-		if err := p.Stop(ctx); err != nil {
-			slog.Error("unable to close processor:", err)
-		}
-	}
-
-	if len(graceful) > 0 {
-		time.Sleep(5 * time.Second)
-	}
-
-	for _, f := range s.factories {
-		if err := f.Close(ctx); err != nil {
-			slog.Error("unable to close factory:", err)
-		}
-	}
-
+	s.service.GracefulShutdown(ctx)
 }

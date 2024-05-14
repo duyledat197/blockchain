@@ -1,4 +1,4 @@
-package ethutil
+package eth_clientutil
 
 import (
 	"encoding/hex"

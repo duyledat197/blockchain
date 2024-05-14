@@ -6,12 +6,12 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 
-	"openmyth/blockchain/pkg/eth"
+	"openmyth/blockchain/pkg/eth_client"
 )
 
 func main() {
 	ctx := context.Background()
-	client := eth.NewDialClient("http://localhost:8545")
+	client := eth_client.NewDialClient("http://localhost:8545")
 	pKey := "0xBa3Fa2e3AbA0602E62471BdCBbdD2ADD0c43962c"
 	balance, err := client.BalanceAt(ctx, common.HexToAddress(pKey), nil)
 	if err != nil {

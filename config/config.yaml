@@ -8,3 +8,8 @@ gateway_service:
 user_service:
   host: ""
   port: "5001"
+mongo_db:
+  schema: mongodb
+  host: localhost
+  port: "27017"
+  database: blockchain

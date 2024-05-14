@@ -14,6 +14,7 @@ var cfgFiles embed.FS
 type Config struct {
 	PostgresDB *Database `mapstructure:"postgres_db,omitempty"`
 	MongoDB    *Database `mapstructure:"mongo_db,omitempty"`
+	Kafka      *Database `mapstructure:"kafka,omitempty"`
 	ETHClient  *Endpoint `mapstructure:"eth_client,omitempty"`
 
 	UserService    *Endpoint `mapstructure:"user_service,omitempty"`

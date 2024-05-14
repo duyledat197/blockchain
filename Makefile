@@ -9,9 +9,15 @@ gen-mock:
 	docker compose -f ${GEN_COMPOSE} up generate_mock
 compose:
 	docker compose -f ${COMPOSE} up -d --build
-deploy-contract:
-	 go run main.go deployContract
 get-accounts:
 	docker compose -f ${COMPOSE} logs ganache
+
+# using go cmd
 start-gateway:
 	go run main.go gateway
+deploy-contract:
+	go run main.go deployContract
+start-user:
+	go run main.go user
+start-watcher:
+	go run main.go watcher

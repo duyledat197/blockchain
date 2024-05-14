@@ -2,6 +2,7 @@ package mongoclient
 
 import (
 	"context"
+	"log/slog"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -38,6 +39,8 @@ func (m *MongoClient) Connect(ctx context.Context) error {
 	if err := client.Ping(ctx, readpref.Primary()); err != nil {
 		return err
 	}
+
+	slog.Info("Connected to MongoDB!!")
 
 	m.Client = client
 

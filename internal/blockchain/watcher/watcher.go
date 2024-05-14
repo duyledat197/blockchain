@@ -4,13 +4,15 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"log/slog"
 
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 
-	"openmyth/blockchain/pkg/eth"
+	"openmyth/blockchain/internal/contract/repositories"
 	"openmyth/blockchain/pkg/iface/processor"
+	"openmyth/blockchain/pkg/iface/pubsub"
 )
 
 type Watcher interface {
@@ -18,7 +20,8 @@ type Watcher interface {
 }
 
 type defaultWatcher struct {
-	client *eth.EthClient
+	myTokenRepo repositories.MyTokenRepo
+	publisher   pubsub.Publisher
 
 	isRunning bool
 }
@@ -26,10 +29,11 @@ type defaultWatcher struct {
 // NewWatcher creates a new Watcher instance.
 //
 // It takes a *eth.EthClient as a parameter and returns a Watcher.
-func NewWatcher(client *eth.EthClient) Watcher {
+func NewWatcher(myTokenRepo repositories.MyTokenRepo, publisher pubsub.Publisher) Watcher {
 	return &defaultWatcher{
-		client:    client,
-		isRunning: true,
+		myTokenRepo: myTokenRepo,
+		publisher:   publisher,
+		isRunning:   true,
 	}
 }
 
@@ -39,12 +43,12 @@ func NewWatcher(client *eth.EthClient) Watcher {
 func (w *defaultWatcher) Start(ctx context.Context) error {
 	query := ethereum.FilterQuery{
 		Addresses: []common.Address{
-			w.client.ContractAddress,
+			w.myTokenRepo.GetContractAddress(),
 		},
 	}
 
 	logs := make(chan types.Log)
-	sub, err := w.client.Client.SubscribeFilterLogs(ctx, query, logs)
+	sub, err := w.myTokenRepo.SubscribeFilterLogs(ctx, query, logs)
 	if err != nil {
 		return fmt.Errorf("unable to subscribe filter: %w", err)
 	}
@@ -74,13 +78,31 @@ func (w *defaultWatcher) Stop(_ context.Context) error {
 //
 // It takes a types.Log parameter named evLog and returns an error.
 func (w *defaultWatcher) handleEventLog(evLog types.Log) {
-	approval, err := w.client.Contract.ParseApproval(evLog)
-	if err == nil && approval != nil {
-		// TODO: Handle approval
+
+	if approval, err := w.myTokenRepo.ParseApproval(evLog); err == nil && approval != nil {
+		b, err := approval.Raw.MarshalJSON()
+		if err != nil {
+			slog.Error("failed to marshal approval", slog.Any("err", err))
+		}
+		if err := w.publisher.Publish(context.Background(), "approval", &pubsub.Pack{
+			Key: approval.Owner.Bytes(),
+			Msg: b,
+		}); err != nil {
+			slog.Error("failed to publish approval", slog.Any("err", err))
+		}
 	}
-	transfer, err := w.client.Contract.ParseTransfer(evLog)
-	if err == nil && transfer != nil {
-		// TODO: Handle transfer
+
+	if transfer, err := w.myTokenRepo.ParseTransfer(evLog); err == nil && transfer != nil {
+		b, err := transfer.Raw.MarshalJSON()
+		if err != nil {
+			slog.Error("failed to marshal transfer", slog.Any("err", err))
+		}
+		if err := w.publisher.Publish(context.Background(), "approval", &pubsub.Pack{
+			Key: transfer.From.Bytes(),
+			Msg: b,
+		}); err != nil {
+			slog.Error("failed to publish transfer", slog.Any("err", err))
+		}
 	}
 
 }
@@ -88,11 +110,11 @@ func (w *defaultWatcher) handleEventLog(evLog types.Log) {
 func (w *defaultWatcher) migrate(ctx context.Context) error {
 	query := ethereum.FilterQuery{
 		Addresses: []common.Address{
-			w.client.ContractAddress,
+			w.myTokenRepo.GetContractAddress(),
 		},
 	}
 
-	evLogs, err := w.client.Client.FilterLogs(ctx, query)
+	evLogs, err := w.myTokenRepo.FilterLogs(ctx, query)
 	if err != nil {
 		return fmt.Errorf("unable to filter logs: %w", err)
 	}
