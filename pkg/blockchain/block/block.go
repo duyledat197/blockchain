@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"time"
 
-	"be-earning/blockchain/util"
+	"openmyth/blockchain/util"
 )
 
 type Block struct {

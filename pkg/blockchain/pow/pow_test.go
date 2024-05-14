@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"be-earning/blockchain/pkg/blockchain/block"
+	"openmyth/blockchain/pkg/blockchain/block"
 )
 
 func TestProofOfWork_General(t *testing.T) {

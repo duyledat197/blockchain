@@ -6,8 +6,8 @@ import (
 	"log/slog"
 	"time"
 
-	"be-earning/blockchain/pkg/eth"
-	"be-earning/blockchain/pkg/iface/pubsub"
+	"openmyth/blockchain/pkg/eth"
+	"openmyth/blockchain/pkg/iface/pubsub"
 )
 
 type Dispatcher interface {

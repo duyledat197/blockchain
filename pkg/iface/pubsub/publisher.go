@@ -3,7 +3,7 @@ package pubsub
 import (
 	"context"
 
-	"be-earning/blockchain/pkg/iface/processor"
+	"openmyth/blockchain/pkg/iface/processor"
 )
 
 type Publisher interface {

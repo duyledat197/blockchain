@@ -5,8 +5,8 @@ import (
 	"math"
 	"math/big"
 
-	"be-earning/blockchain/pkg/blockchain/block"
-	"be-earning/blockchain/util"
+	"openmyth/blockchain/pkg/blockchain/block"
+	"openmyth/blockchain/util"
 )
 
 const (

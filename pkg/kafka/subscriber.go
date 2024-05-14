@@ -6,7 +6,7 @@ import (
 
 	"github.com/IBM/sarama"
 
-	"be-earning/blockchain/pkg/iface/pubsub"
+	"openmyth/blockchain/pkg/iface/pubsub"
 )
 
 type subscriber struct {

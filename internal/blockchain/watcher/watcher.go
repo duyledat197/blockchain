@@ -9,8 +9,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 
-	"be-earning/blockchain/pkg/eth"
-	"be-earning/blockchain/pkg/iface/processor"
+	"openmyth/blockchain/pkg/eth"
+	"openmyth/blockchain/pkg/iface/processor"
 )
 
 type Watcher interface {

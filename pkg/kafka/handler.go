@@ -1,7 +1,7 @@
 package kafka
 
 import (
-	"be-earning/blockchain/pkg/iface/pubsub"
+	"openmyth/blockchain/pkg/iface/pubsub"
 
 	"github.com/IBM/sarama"
 )
