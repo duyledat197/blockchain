@@ -21,3 +21,10 @@ start-user:
 	go run main.go user
 start-watcher:
 	go run main.go watcher
+
+
+# testing
+test-publisher:
+	go run tests/kafka/publisher/main.go  
+test-subscriber:
+	go run tests/kafka/subscriber/main.go  

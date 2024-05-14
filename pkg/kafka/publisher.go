@@ -3,6 +3,7 @@ package kafka
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/IBM/sarama"
 
@@ -21,22 +22,27 @@ func NewPublisher(
 	brokerAddrs ...string,
 ) pubsub.Publisher {
 	config := sarama.NewConfig()
+
 	config.ClientID = clientID
+	// config.Net.DialTimeout = 5 * time.Second
+	config.Producer.Return.Successes = true
+	config.Producer.Transaction.Retry.Backoff = 10
 
 	return &publisher{
 		clientID:    clientID,
 		brokerAddrs: brokerAddrs,
+		config:      config,
 	}
 }
 
 func (p *publisher) Connect(ctx context.Context) error {
 	producer, err := sarama.NewSyncProducer(p.brokerAddrs, p.config)
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("unable to create producer: %w", err)
 	}
 
 	p.producer = producer
-
+	log.Println("Connect kafka success!")
 	return nil
 }
 
