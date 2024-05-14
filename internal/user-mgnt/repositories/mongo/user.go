@@ -2,12 +2,14 @@ package mongo
 
 import (
 	"context"
+	"errors"
 
 	"go.mongodb.org/mongo-driver/mongo"
 
 	"openmyth/blockchain/internal/user-mgnt/entities"
 	"openmyth/blockchain/internal/user-mgnt/repositories"
 	mongoclient "openmyth/blockchain/pkg/mongo_client"
+	"openmyth/blockchain/pkg/xerror"
 )
 
 type userRepository struct {
@@ -51,6 +53,10 @@ func (r *userRepository) FindUser(ctx context.Context, id string) (*entities.Use
 	if err := r.collection.FindOne(ctx, &entities.User{
 		ID: id,
 	}).Decode(&result); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, xerror.ErrNotFound
+		}
+
 		return nil, err
 	}
 
@@ -67,6 +73,10 @@ func (r *userRepository) FindUserByUsername(ctx context.Context, username string
 	if err := r.collection.FindOne(ctx, &entities.User{
 		UserName: username,
 	}).Decode(&result); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, xerror.ErrNotFound
+		}
+
 		return nil, err
 	}
 

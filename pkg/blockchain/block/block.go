@@ -1,10 +1,7 @@
 package block
 
 import (
-	"strconv"
 	"time"
-
-	"openmyth/blockchain/util"
 )
 
 type Block struct {
@@ -17,10 +14,19 @@ type Block struct {
 }
 
 // SetHash calculates the hash value of a block based on its previous block hash, data, and timestamp.
-func (b *Block) SetHash() {
-	timestamp := []byte(strconv.FormatInt(b.Timestamp, 10))
+func (b *Block) SetHash(hash []byte) {
+	b.Hash = hash
+}
 
-	b.Hash = util.HashSHA256(b.PrevBlockHash, b.Data, timestamp)
+// SetNonce sets the nonce value of the Block object.
+//
+// Parameters:
+// - nonce: The nonce value to be set.
+//
+// Returns:
+// This function does not return anything.
+func (b *Block) SetNonce(nonce int64) {
+	b.Nonce = nonce
 }
 
 // NewBlock creates a new Block object with the given index, data, and previous block hash.
@@ -39,8 +45,6 @@ func NewBlock(index uint64, data, prevBlockHash []byte) *Block {
 		Data:          data,
 		PrevBlockHash: prevBlockHash,
 	}
-
-	block.SetHash()
 
 	return block
 }

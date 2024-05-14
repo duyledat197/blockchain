@@ -7,6 +7,7 @@ require (
 	github.com/envoyproxy/protoc-gen-validate v1.0.2
 	github.com/ethereum/go-ethereum v1.14.3
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.1
+	github.com/reddit/jwt-go v3.2.1+incompatible
 	github.com/stretchr/testify v1.9.0
 	go.mongodb.org/mongo-driver v1.15.0
 	golang.org/x/crypto v0.22.0
@@ -37,6 +38,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/deckarep/golang-set/v2 v2.1.0 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.1 // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/eapache/go-resiliency v1.6.0 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20230731223053-c322873962e3 // indirect
 	github.com/eapache/queue v1.1.0 // indirect

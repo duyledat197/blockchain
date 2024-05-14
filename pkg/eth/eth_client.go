@@ -14,21 +14,21 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/rpc"
 
-	abi "openmyth/blockchain/idl/contracts"
+	api "openmyth/blockchain/idl/contracts"
 	"openmyth/blockchain/pkg/blockchain/block"
 )
 
 type EthClient struct {
 	Client          IClient
 	ContractAddress common.Address
-	Erc20           *abi.ERC20
+	Erc20           *api.ERC20
 	rpcClient       *rpc.Client
 }
 
 // NewEthClient initializes a new Ethereum client.
 func NewEthClient(client IClient) *EthClient {
 	contractAddr := common.HexToAddress(os.Getenv("CONTRACT_ADDRESS"))
-	erc20Contract, err := abi.NewERC20(contractAddr, client)
+	erc20Contract, err := api.NewERC20(contractAddr, client)
 	if err != nil {
 		log.Fatalf("unable to create ERC20 instance: %v", err)
 	}
