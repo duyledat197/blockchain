@@ -47,6 +47,12 @@ func (r *userRepository) Create(ctx context.Context, data *entities.User) error 
 	return nil
 }
 
+// FindUser finds a user by their ID in the user repository.
+//
+// It takes a context.Context and a string representing the user ID as parameters.
+// It returns a pointer to an entities.User and an error. If the user is not found,
+// it returns xerror.ErrNotFound. If there is an error retrieving the user, it
+// returns the error.
 func (r *userRepository) FindUser(ctx context.Context, id string) (*entities.User, error) {
 	var result entities.User
 

@@ -34,12 +34,12 @@ func NewBlockchain() *Blockchain {
 // Return:
 // None.
 func (bc *Blockchain) AddBlock(block *block.Block) error {
-	bc.Lock()
-	defer bc.Unlock()
 
 	latestBlock := bc.GetLatestBlock()
 	lastBlockIndex := latestBlock.Index
 
+	bc.Lock()
+	defer bc.Unlock()
 	if block.Index != lastBlockIndex+1 {
 		return fmt.Errorf("block index is not valid")
 	}
@@ -101,4 +101,18 @@ func (bc *Blockchain) ValidateAllBlocks() bool {
 	}
 
 	return true
+}
+
+// GetBlocks returns all the blocks in the blockchain.
+//
+// It acquires a lock on the blockchain to ensure thread safety.
+// The function then returns the slice of blocks in the blockchain.
+//
+// Returns:
+// - []*block.Block: The slice of blocks in the blockchain.
+func (bc *Blockchain) GetBlocks() []*block.Block {
+	bc.Lock()
+	defer bc.Unlock()
+
+	return bc.blocks
 }

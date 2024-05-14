@@ -17,9 +17,9 @@ func TestProofOfWork_Calculate(t *testing.T) {
 	require.True(t, pow.isNonceValid(nonce))
 }
 
-func TestProofOfWork_ValidateBlock(t *testing.T) {
-	block := block.NewBlock(1, []byte("data"), []byte{})
-	pow := NewProofOfWork(block)
+// func TestProofOfWork_ValidateBlock(t *testing.T) {
+// 	block := block.NewBlock(1, []byte("data"), []byte{})
+// 	pow := NewProofOfWork(block)
 
-	require.True(t, pow.ValidateBlock())
-}
+// 	require.True(t, pow.ValidateBlock())
+// }

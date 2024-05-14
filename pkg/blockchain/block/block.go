@@ -5,12 +5,12 @@ import (
 )
 
 type Block struct {
-	Index         uint64
-	Timestamp     int64
-	Data          []byte
-	PrevBlockHash []byte
-	Hash          []byte
-	Nonce         int64
+	Index         uint64 `json:"index,omitempty"`
+	Timestamp     int64  `json:"timestamp,omitempty"`
+	Data          []byte `json:"data,omitempty"`
+	PrevBlockHash []byte `json:"prev_block_hash,omitempty"`
+	Hash          []byte `json:"hash,omitempty"`
+	Nonce         int64  `json:"nonce,omitempty"`
 }
 
 // SetHash calculates the hash value of a block based on its previous block hash, data, and timestamp.

@@ -22,5 +22,15 @@ services:
     image: trufflesuite/ganache-cli:latest
     ports:
       - "8545:8545"
+      - "7545:7545"
     volumes:
       - ./ganache_data:/ganache_data
+
+  mongodb:
+    hostname: mongodb
+    image: mongo
+    volumes:
+      - ./mongo-volume:/data/db
+    ports:
+      - "27017:27017"
+    restart: always

@@ -32,6 +32,7 @@ func DeployMyTokenContract(ctx context.Context, client *eth.EthClient, privKey *
 	if err != nil {
 		return nil, fmt.Errorf("failed to create transactor: %v", err)
 	}
+
 	contractAddr, _, _, err := abi.DeployMyToken(txOpts, client.Client, "MyToken", "MTK", 18)
 	if err != nil {
 		return nil, fmt.Errorf("failed to deploy contract: %v", err)

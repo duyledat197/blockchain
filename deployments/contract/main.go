@@ -13,18 +13,10 @@ import (
 
 func main() {
 	ctx := context.Background()
-	var client eth.IClient
 
-	env := os.Getenv("ENV")
 	privateKey := os.Getenv("PRIVATE_KEY")
 	chainURL := os.Getenv("CHAIN_URL")
-
-	switch env {
-	case "dev", "local":
-		client = eth.NewSimulatedClient()
-	case "stg", "prd":
-		client = eth.NewDialClient(chainURL)
-	}
+	client := eth.NewDialClient(chainURL)
 
 	importedPrivateKey, err := crypto.HexToECDSA(privateKey)
 	if err != nil {

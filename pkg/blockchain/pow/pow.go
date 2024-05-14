@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	targetBits = 24 // difficult value
+	targetBits = 5 // difficult value
 	maxNonce   = math.MaxInt64
 )
 
