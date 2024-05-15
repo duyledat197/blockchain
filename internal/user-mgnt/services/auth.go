@@ -22,6 +22,10 @@ type authService struct {
 	pb.UnimplementedAuthServiceServer
 }
 
+// NewAuthService creates a new AuthService instance with the provided user repository.
+//
+// userRepo: the user repository for the AuthService.
+// Returns an AuthServiceServer.
 func NewAuthService(userRepo repositories.UserRepository) pb.AuthServiceServer {
 	return &authService{
 		userRepo: userRepo,
@@ -72,7 +76,7 @@ func (s *authService) Register(ctx context.Context, req *pb.RegisterRequest) (*p
 		return nil, status.Errorf(codes.Internal, "unable to hash password: %v", err)
 	}
 	u, err := s.userRepo.FindUserByUsername(ctx, req.GetUsername())
-	if !errors.Is(err, xerror.ErrNotFound) {
+	if err != nil && !errors.Is(err, xerror.ErrNotFound) {
 		return nil, status.Errorf(codes.Internal, "unable to find user: %v", err)
 	}
 

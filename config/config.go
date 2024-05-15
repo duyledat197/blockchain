@@ -17,6 +17,7 @@ type Config struct {
 	UserService           *Endpoint `mapstructure:"user_service,omitempty"`
 	GatewayService        *Endpoint `mapstructure:"gateway_service,omitempty"`
 	ContractReaderService *Endpoint `mapstructure:"contract_reader_service,omitempty"`
+	Frontend              *Endpoint `mapstructure:"frontend,omitempty"`
 
 	SymetricKey   string `mapstructure:"symetric_key,omitempty"`
 	FileLogOutPut string `mapstructure:"file_log_out_put,omitempty"`

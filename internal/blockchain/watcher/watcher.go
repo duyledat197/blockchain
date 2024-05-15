@@ -59,12 +59,10 @@ func (w *defaultWatcher) Start(ctx context.Context) error {
 		return fmt.Errorf("unable to subscribe filter: %w", err)
 	}
 	for w.isRunning {
-		log.Println("waiting")
 		select {
 		case err := <-sub.Err():
 			log.Fatal(err)
 		case evLog := <-logs:
-			log.Println("event log")
 			go w.handleEventLog(evLog)
 		}
 	}

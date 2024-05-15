@@ -2,11 +2,9 @@ package gateway
 
 import (
 	"context"
-	"net/http"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 
-	"openmyth/blockchain/html"
 	contractPb "openmyth/blockchain/idl/pb/contract"
 	userPb "openmyth/blockchain/idl/pb/user"
 	"openmyth/blockchain/pkg/grpc_client"
@@ -46,14 +44,6 @@ func (s *Server) loadServer(ctx context.Context) {
 		userPb.RegisterAuthServiceHandlerClient(ctx, mux, s.authClient)
 		userPb.RegisterUserServiceHandlerClient(ctx, mux, s.userClient)
 		contractPb.RegisterContractReaderServiceHandlerClient(ctx, mux, s.contractReaderClient)
-
-		mux.HandlePath(http.MethodGet, "/home", func(w http.ResponseWriter, r *http.Request, pathParams map[string]string) {
-			// w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "text/html")
-
-			// http.ServeFile(w, r, "./html/index.html")
-			http.ServeFileFS(w, r, html.Pages, "index.html")
-		})
 
 	}, s.service.Cfg.GatewayService)
 

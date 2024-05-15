@@ -57,7 +57,7 @@ func (c *GrpcClient) Connect(ctx context.Context) error {
 		return err
 	}
 
-	slog.Info("connect to %s success!", c.cfg.Port)
+	slog.Info("connect client success!", slog.Any("port", c.cfg.Port))
 
 	c.ClientConn = conn
 

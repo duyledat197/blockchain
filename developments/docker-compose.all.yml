@@ -1,6 +1,21 @@
 version: "3.4"
 
 services:
+  frontend:
+    image: openmyth/blockchain
+    ports:
+      - "9999:9999"
+    command: frontend
+    environment:
+      SERVICE: frontend
+    # depends_on:
+    #   - user
+    #   - contract_reader
+    volumes:
+      - "../config/gateway:/app/config"
+      - "../config/common:/app/common"
+      - "../html:/html"
+
   # gateway service
   gateway:
     image: openmyth/blockchain
@@ -15,6 +30,7 @@ services:
     volumes:
       - "../config/gateway:/app/config"
       - "../config/common:/app/common"
+      - "../html:/html"
   # user service
   user:
     image: openmyth/blockchain

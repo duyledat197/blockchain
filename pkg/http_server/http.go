@@ -18,6 +18,14 @@ type HttpServer struct {
 	endpoint *config.Endpoint
 }
 
+// NewHttpServer creates a new HTTP server with the provided handler and endpoint.
+//
+// Parameters:
+//   - handler: the function to handle requests on the server.
+//   - endpoint: the configuration for the server's endpoint.
+//
+// Returns:
+//   - *HttpServer: the newly created HTTP server.
 func NewHttpServer(
 	handler func(mux *runtime.ServeMux),
 	endpoint *config.Endpoint,
@@ -49,6 +57,10 @@ func NewHttpServer(
 	}
 }
 
+// Start starts the HTTP server.
+//
+// ctx context.Context
+// error
 func (s *HttpServer) Start(ctx context.Context) error {
 	log.Printf("Server listin in port: %s\n", s.endpoint.Port)
 	if err := s.server.ListenAndServe(); err != nil {
@@ -58,6 +70,10 @@ func (s *HttpServer) Start(ctx context.Context) error {
 	return nil
 }
 
+// Stop stops the HTTP server gracefully.
+//
+// ctx context.Context
+// error
 func (s *HttpServer) Stop(ctx context.Context) error {
 	if err := s.server.Shutdown(ctx); err != nil {
 		return err

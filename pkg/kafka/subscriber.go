@@ -18,6 +18,10 @@ type subscriber struct {
 	handler     pubsub.SubscribeHandler
 }
 
+// NewSubscriber creates a new subscriber for consuming messages from Kafka.
+//
+// It takes in the groupID as a string, brokerAddrs as a slice of strings, topics as a slice of strings, and a handler of type pubsub.SubscribeHandler.
+// It returns a pubsub.Subscriber.
 func NewSubscriber(
 	groupID string,
 	brokerAddrs []string,
@@ -33,7 +37,7 @@ func NewSubscriber(
 		log.Fatalf("failed to create consumer group client: %v", err)
 	}
 
-	log.Println("connect subscribe kafka success!")
+	log.Println("subscribe kafka success!")
 
 	return &subscriber{
 		groupID:     groupID,
@@ -44,10 +48,18 @@ func NewSubscriber(
 	}
 }
 
+// Stop stops the subscriber.
+//
+// ctx context.Context
+// error
 func (g *subscriber) Stop(ctx context.Context) error {
 	return g.client.Close()
 }
 
+// Start starts the subscriber with the provided context.
+//
+// ctx: Context to control the execution flow.
+// error: An error if the function encounters any issues.
 func (g *subscriber) Start(ctx context.Context) error {
 	log.Println(g.groupID)
 	consumer := consumerGroupHandler{
