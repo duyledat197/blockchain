@@ -3,6 +3,7 @@ package mongo
 import (
 	"context"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 
@@ -17,6 +18,11 @@ type approvalRepository struct {
 	collection   *mongo.Collection
 }
 
+// NewApprovalRepository initializes a new ApprovalRepository with the provided Mongo client and database name.
+//
+// - mgoClient: The Mongo client for the repository.
+// - databaseName: The name of the database for the repository.
+// Return type: repositories.ApprovalRepository.
 func NewApprovalRepository(mgoClient *mongoclient.MongoClient, databaseName string) repositories.ApprovalRepository {
 	return &approvalRepository{
 		mgoClient:    mgoClient,
@@ -24,6 +30,10 @@ func NewApprovalRepository(mgoClient *mongoclient.MongoClient, databaseName stri
 	}
 }
 
+// getCollection retrieves the collection for approvals.
+//
+// No parameters.
+// Return type: *mongo.Collection.
 func (r *approvalRepository) getCollection() *mongo.Collection {
 	if r.collection == nil {
 		e := &entities.Approval{}
@@ -33,6 +43,11 @@ func (r *approvalRepository) getCollection() *mongo.Collection {
 	return r.collection
 }
 
+// Create creates a new approval in the repository.
+//
+// - ctx: The context for creating the approval.
+// - data: The approval data to be inserted.
+// Return type: error.
 func (r *approvalRepository) Create(ctx context.Context, data *entities.Approval) error {
 	res, err := r.getCollection().InsertOne(ctx, data)
 	if err != nil {
@@ -44,6 +59,11 @@ func (r *approvalRepository) Create(ctx context.Context, data *entities.Approval
 	return nil
 }
 
+// FindByOwner retrieves approvals by owner.
+//
+// - ctx: The context for retrieving the approvals.
+// - owner: The owner of the approvals to retrieve.
+// Return type: []*entities.Approval and error.
 func (r *approvalRepository) FindByOwner(ctx context.Context, owner string) ([]*entities.Approval, error) {
 	var result []*entities.Approval
 
@@ -61,9 +81,13 @@ func (r *approvalRepository) FindByOwner(ctx context.Context, owner string) ([]*
 	return result, nil
 }
 
+// GetList retrieves a list of approvals.
+//
+// - ctx: The context for retrieving the list of approvals.
+// Return type: []*entities.Approval and error.
 func (r *approvalRepository) GetList(ctx context.Context) ([]*entities.Approval, error) {
 	var result []*entities.Approval
-	cur, err := r.getCollection().Find(ctx, &entities.Approval{})
+	cur, err := r.getCollection().Find(ctx, bson.D{})
 	if err != nil {
 		return nil, err
 	}

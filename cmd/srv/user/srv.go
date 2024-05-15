@@ -30,6 +30,10 @@ func NewServer() *Server {
 	}
 }
 
+// loadDatabases initializes the MongoDB client for the server.
+//
+// No parameters.
+// No return value.
 func (s *Server) loadDatabases() {
 	log.Println("s.service.Cfg.MongoDB.Address()", s.service.Cfg.MongoDB.Address())
 	s.mongoClient = mongoclient.NewMongoClient(s.service.Cfg.MongoDB.Address())
@@ -37,6 +41,10 @@ func (s *Server) loadDatabases() {
 	s.service.WithFactories(s.mongoClient)
 }
 
+// loadRepositories initializes the user repository for the server.
+//
+// No parameters.
+// No return value.
 func (s *Server) loadRepositories() {
 	s.userRepo = mongo.NewUserRepository(s.mongoClient, s.service.Cfg.MongoDB.Database)
 }

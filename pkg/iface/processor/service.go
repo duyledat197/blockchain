@@ -69,6 +69,7 @@ func (s *Service) GracefulShutdown(ctx context.Context) {
 	}
 
 	for _, p := range s.processors {
+		log.Println("asdsa")
 		// go 1.22 already resolve but still using for sure
 		go func(p Processor) {
 			if err := p.Start(ctx); err != nil {

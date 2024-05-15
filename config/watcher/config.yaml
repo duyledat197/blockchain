@@ -1,9 +1,9 @@
 eth_client: 
   host: "http://ganache"
   port: "8545"
-ws_eth_client:
+ws_eth_client: 
   host: "ws://ganache"
-  port: "8546"
+  port: "8545"
 kafka:
   host: kafka
   port: "9092"

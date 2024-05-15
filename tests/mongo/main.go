@@ -5,10 +5,8 @@ import (
 	"log"
 
 	"openmyth/blockchain/config"
-	"openmyth/blockchain/internal/user-mgnt/entities"
-	"openmyth/blockchain/internal/user-mgnt/repositories/mongo"
+	"openmyth/blockchain/internal/contract/repositories/mongo"
 	mongoclient "openmyth/blockchain/pkg/mongo_client"
-	"openmyth/blockchain/util"
 )
 
 func main() {
@@ -19,7 +17,6 @@ func main() {
 		Port:     "27017",
 		Database: "blockchain",
 	}
-	log.Println(db.Address())
 	mgoClient := mongoclient.NewMongoClient(db.Address())
 
 	if err := mgoClient.Connect(ctx); err != nil {
@@ -27,12 +24,7 @@ func main() {
 	}
 	defer mgoClient.Close(ctx)
 
-	userRepo := mongo.NewUserRepository(mgoClient, "test")
-	pwd, _ := util.HashPassword("test_password")
-	if err := userRepo.Create(ctx, &entities.User{
-		UserName:       "test_user",
-		HashedPassword: pwd,
-	}); err != nil {
-		log.Fatalf("unable to create user: %v", err)
-	}
+	transferRepo := mongo.NewTransferRepository(mgoClient, db.Database)
+	result, _ := transferRepo.GetList(ctx)
+	log.Println(len(result))
 }

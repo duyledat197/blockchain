@@ -3,6 +3,7 @@ package contractwriter
 import (
 	"context"
 	"log"
+	"os"
 
 	pb "openmyth/blockchain/idl/pb/common"
 	"openmyth/blockchain/internal/contract/repositories"
@@ -64,9 +65,8 @@ func (s *Server) loadServices() {
 }
 
 func (s *Server) loadSubscriber() {
-	log.Println("s.service.Cfg.Kafka.Address()", s.service.Cfg.Kafka.Address())
 	s.subscriber = kafka.NewSubscriber(
-		"contract-writer",
+		os.Getenv("SERVICE"),
 		[]string{s.service.Cfg.Kafka.Address()},
 		[]string{
 			pb.TopicEvent_TOPIC_EVENT_APPROVAL.String(),
@@ -87,6 +87,6 @@ func (s *Server) Run(ctx context.Context) {
 	s.loadRepositories()
 	s.loadServices()
 	s.loadSubscriber()
-
+	log.Println("run graceful shutdown")
 	s.service.GracefulShutdown(ctx)
 }

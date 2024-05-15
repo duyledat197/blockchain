@@ -1,9 +1,11 @@
 package kafka
 
 import (
-	"openmyth/blockchain/pkg/iface/pubsub"
+	"log"
 
 	"github.com/IBM/sarama"
+
+	"openmyth/blockchain/pkg/iface/pubsub"
 )
 
 type consumerGroupHandler struct {
@@ -22,6 +24,7 @@ func (h *consumerGroupHandler) Cleanup(session sarama.ConsumerGroupSession) erro
 // TODO: ConsumeClaim must start a consumer loop of ConsumerGroupClaim's Messages().
 func (h *consumerGroupHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	topic := claim.Topic()
+	log.Println("topic", topic)
 	for message := range claim.Messages() {
 		session.MarkMessage(message, "")
 		h.fn(

@@ -12,6 +12,9 @@ services:
     depends_on:
       - user
       - contract_reader
+    volumes:
+      - "../config/gateway:/app/config"
+      - "../config/common:/app/common"
   # user service
   user:
     image: openmyth/blockchain
@@ -22,6 +25,9 @@ services:
       SERVICE: user
     depends_on:
       - mongodb
+    volumes:
+      - "../config/user:/app/config"
+      - "../config/common:/app/common"
 
   # watcher service
   watcher:
@@ -32,6 +38,9 @@ services:
     depends_on:
       - ganache
       - kafka
+    volumes:
+      - "../config/watcher:/app/config"
+      - "../config/common:/app/common"
 
   # contact_writer service
   contract_writer:
@@ -42,6 +51,9 @@ services:
     depends_on:
       - mongodb
       - kafka
+    volumes:
+      - "../config/contract_writer:/app/config"
+      - "../config/common:/app/common"
 
   # contract_reader service
   contract_reader:
@@ -54,6 +66,22 @@ services:
     depends_on:
       - mongodb
       - kafka
+    volumes:
+      - "../config/contract_reader:/app/config"
+      - "../config/common:/app/common"
+
+  # deploy service
+  deploy_contract:
+    image: openmyth/blockchain
+    command: deployContract
+    environment:
+      SERVICE: deploy_contract
+    depends_on:
+      - ganache
+      - kafka
+    volumes:
+      - "../config/deploy_contract:/app/config"
+      - "../config/common:/app/common"
 
   ################## infrstructure #######################
   kafka:

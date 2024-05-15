@@ -27,11 +27,13 @@ func NewSubscriber(
 	config := sarama.NewConfig()
 	config.Consumer.Group.Rebalance.Strategy = sarama.NewBalanceStrategyRoundRobin()
 	config.Consumer.Offsets.Initial = sarama.OffsetNewest
-
+	log.Println("brokerAddrs", brokerAddrs)
 	client, err := sarama.NewConsumerGroup(brokerAddrs, groupID, config)
 	if err != nil {
 		log.Fatalf("failed to create consumer group client: %v", err)
 	}
+
+	log.Println("connect subscribe kafka success!")
 
 	return &subscriber{
 		groupID:     groupID,
@@ -47,12 +49,14 @@ func (g *subscriber) Stop(ctx context.Context) error {
 }
 
 func (g *subscriber) Start(ctx context.Context) error {
+	log.Println(g.groupID)
 	consumer := consumerGroupHandler{
 		ready: make(chan bool),
 		fn:    g.handler,
 	}
 	go func() {
 		for {
+			log.Println("consume successful")
 			// TODO: `Consume` should be called inside an infinite loop, when a
 			// TODO: server-side rebalance happens, the consumer session will need to be
 			// TODO: recreated to get the new claims

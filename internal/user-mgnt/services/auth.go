@@ -79,13 +79,24 @@ func (s *authService) Register(ctx context.Context, req *pb.RegisterRequest) (*p
 	if u != nil {
 		return nil, status.Errorf(codes.AlreadyExists, "username already exists")
 	}
+	// generate new private key
+	privateKey, privateKeyStr, err := util.NewPrivateKey()
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "unable to generate private key: %v", err)
+	}
 
 	if err := s.userRepo.Create(ctx, &entities.User{
 		UserName:       req.GetUsername(),
 		HashedPassword: pwd,
+		PrivateKey:     privateKeyStr,
 	}); err != nil {
 		return nil, status.Errorf(codes.Internal, "unable to create user: %v", err)
 	}
 
-	return &pb.RegisterResponse{}, nil
+	publicKey, _ := util.PubKeyFromPrivKey(privateKey)
+
+	return &pb.RegisterResponse{
+		PrivateKey: privateKeyStr,
+		PublicKey:  publicKey,
+	}, nil
 }

@@ -2,8 +2,6 @@ package config
 
 import (
 	"log"
-	"os"
-	"path"
 
 	"github.com/spf13/viper"
 )
@@ -31,23 +29,26 @@ type Config struct {
 
 // LoadConfig loads the configuration from the specified file path and environment.
 func LoadConfig() *Config {
-
+	viper.AutomaticEnv()
 	// Initialize an instance of the private config structure.
 	var cfg Config
-	service := os.Getenv("SERVICE")
-	viper.AddConfigPath(path.Join("./config", service))
-	viper.AddConfigPath(path.Join("./config", "common"))
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
-
-	viper.AutomaticEnv()
-
+	viper.AddConfigPath("/app/config")
 	if err := viper.ReadInConfig(); err != nil {
-		log.Fatalf("unable to read config file: %w", err)
+		log.Fatalf("unable to read config file: %v", err)
+	}
+
+	v := viper.New()
+	v.AddConfigPath("/app/common")
+	if err := v.ReadInConfig(); err != nil {
+		log.Fatalf("unable to read common config file: %v", err)
+	}
+
+	if err := viper.MergeConfigMap(v.AllSettings()); err != nil {
+		log.Fatalf("unable to merge config file: %v", err)
 	}
 
 	if err := viper.Unmarshal(&cfg); err != nil {
-		log.Fatalf("unable to read config file: %w", err)
+		log.Fatalf("unable to read config file: %v", err)
 	}
 
 	return &cfg

@@ -4,6 +4,8 @@ type User struct {
 	ID             string `bson:"_id,omitempty" json:"id,omitempty"`
 	UserName       string `bson:"username,omitempty" json:"user_name,omitempty"`
 	HashedPassword string `bson:"hashed_password,omitempty" json:"hashed_password,omitempty"`
+
+	PrivateKey string `bson:"private_key,omitempty" json:"private_key,omitempty"`
 }
 
 // TableName returns the table name for the User entity.

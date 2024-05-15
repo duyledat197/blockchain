@@ -158,7 +158,15 @@
       }
     },
     "userRegisterResponse": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "privateKey": {
+          "type": "string"
+        },
+        "publicKey": {
+          "type": "string"
+        }
+      }
     }
   }
 }

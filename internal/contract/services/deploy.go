@@ -37,6 +37,11 @@ func NewDeployContractService(
 		privKeyStr: privKey,
 	}
 }
+
+// Start deploys a contract and writes its address to a config file.
+//
+// ctx: The context.Context for cancellation and timeouts.
+// error: An error if the deployment or file writing fails.
 func (d *DeployContractService) Start(ctx context.Context) error {
 
 	contractAddress, err := d.deployMyTokenContract(ctx)
@@ -46,22 +51,30 @@ func (d *DeployContractService) Start(ctx context.Context) error {
 
 	slog.Info("Contract address:", slog.String("address", contractAddress.Hex()))
 
-	b, err := yaml.Marshal(map[string]string{
-		"contract_address": contractAddress.Hex(),
-		"private_key":      d.privKeyStr,
+	type cfg struct {
+		ContractAddress string `yaml:"contract_address"`
+		PrivateKey      string `yaml:"private_key"`
+	}
+	b, err := yaml.Marshal(&cfg{
+		ContractAddress: contractAddress.Hex(),
+		PrivateKey:      d.privKeyStr,
 	})
 	if err != nil {
 		return fmt.Errorf("Failed to marshal contract address: %v", err)
 	}
 
 	// wite to config package for later use
-	if err := os.WriteFile("./config/common/config.yaml", b, os.ModePerm); err != nil {
+	if err := os.WriteFile("/app/common/config.yaml", b, os.ModePerm); err != nil {
 		return fmt.Errorf("failed to write contract address: %v", err)
 	}
 
 	return nil
 }
 
+// Stop stops the DeployContractService gracefully.
+//
+// ctx: The context.Context for cancellation and timeouts.
+// Return type: An error.
 func (d *DeployContractService) Stop(ctx context.Context) error {
 	return nil
 }

@@ -43,6 +43,9 @@ func NewWatcher(myTokenRepo repositories.MyTokenRepository, publisher pubsub.Pub
 //
 // It takes a context.Context as a parameter and returns an error.
 func (w *defaultWatcher) Start(ctx context.Context) error {
+	if err := w.migrate(ctx); err != nil {
+		log.Fatalln(err)
+	}
 	query := ethereum.FilterQuery{
 		Addresses: []common.Address{
 			w.myTokenRepo.GetContractAddress(),
@@ -55,13 +58,13 @@ func (w *defaultWatcher) Start(ctx context.Context) error {
 		log.Print(err)
 		return fmt.Errorf("unable to subscribe filter: %w", err)
 	}
-	log.Println("w.isRunning", w.isRunning)
 	for w.isRunning {
 		log.Println("waiting")
 		select {
 		case err := <-sub.Err():
 			log.Fatal(err)
 		case evLog := <-logs:
+			log.Println("event log")
 			go w.handleEventLog(evLog)
 		}
 	}
@@ -120,6 +123,11 @@ func (w *defaultWatcher) handleEventLog(evLog types.Log) {
 
 }
 
+// migrate migrates the watcher by filtering logs based on the contract address and handling each event log.
+//
+// Parameters:
+// - ctx: The context.Context object for cancellation and timeouts.
+// Return type: An error.
 func (w *defaultWatcher) migrate(ctx context.Context) error {
 	query := ethereum.FilterQuery{
 		Addresses: []common.Address{

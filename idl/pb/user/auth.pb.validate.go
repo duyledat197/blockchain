@@ -190,6 +190,10 @@ func (m *RegisterResponse) validate(all bool) error {
 
 	var errors []error
 
+	// no validation rules for PrivateKey
+
+	// no validation rules for PublicKey
+
 	if len(errors) > 0 {
 		return RegisterResponseMultiError(errors)
 	}

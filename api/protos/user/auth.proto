@@ -30,7 +30,10 @@ message RegisterRequest {
       [ (validate.rules).string = {min_len : 6, max_len : 20} ];
 }
 
-message RegisterResponse {}
+message RegisterResponse {
+  string private_key = 1;
+  string public_key = 2;
+}
 
 message LoginRequest {
   string username = 1 [ (validate.rules).string = {min_len : 4, max_len : 20} ];
