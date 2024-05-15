@@ -17,7 +17,7 @@ import (
 type Server struct {
 	publisher pubsub.Publisher
 
-	myTokenRepo repositories.MyTokenRepo
+	myTokenRepo repositories.MyTokenRepository
 
 	service *processor.Service
 

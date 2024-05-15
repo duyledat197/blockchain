@@ -2,7 +2,6 @@ package eth
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"log/slog"
 	"math/big"
@@ -16,7 +15,6 @@ import (
 
 	contract "openmyth/blockchain/idl/contracts"
 	"openmyth/blockchain/internal/contract/repositories"
-	"openmyth/blockchain/pkg/blockchain/block"
 	"openmyth/blockchain/pkg/eth_client"
 )
 
@@ -27,7 +25,7 @@ type MyTokenRepo struct {
 }
 
 // NewMyTokenRepository initializes a new Ethereum client.
-func NewMyTokenRepository(client eth_client.IClient) repositories.MyTokenRepo {
+func NewMyTokenRepository(client eth_client.IClient) repositories.MyTokenRepository {
 	contractAddr := common.HexToAddress(os.Getenv("CONTRACT_ADDRESS"))
 	contract, err := contract.NewMyToken(contractAddr, client)
 	if err != nil {
@@ -39,43 +37,6 @@ func NewMyTokenRepository(client eth_client.IClient) repositories.MyTokenRepo {
 		contractAddress: contractAddr,
 		contract:        contract,
 	}
-}
-
-// RetrieveLatestBlock retrieves the latest block from the Ethereum blockchain.
-//
-// It takes a context.Context as a parameter to handle cancellation and timeouts.
-// It returns a pointer to a block.Block struct, which contains information about the latest block,
-// or an error if the retrieval fails.
-func (c *MyTokenRepo) RetrieveLatestBlock(ctx context.Context) (*block.Block, error) {
-	lastestBlock, err := c.client.BlockByNumber(ctx, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get latest block: %w", err)
-	}
-	return &block.Block{
-		Index:         lastestBlock.Number().Uint64(),
-		Timestamp:     int64(lastestBlock.Time()),
-		PrevBlockHash: lastestBlock.ParentHash().Bytes(),
-		Hash:          lastestBlock.Hash().Bytes(),
-		Nonce:         int64(lastestBlock.Nonce()),
-	}, nil
-}
-
-// RetrieveBalanceOf retrieves the balance of the specified address from the Ethereum blockchain.
-//
-// Parameters:
-// - ctx: The context.Context object for cancellation and timeouts.
-// - address: The address for which to retrieve the balance.
-//
-// Returns:
-// - uint64: The balance of the specified address.
-// - error: An error if the retrieval fails.
-func (c *MyTokenRepo) RetrieveBalanceOf(ctx context.Context, address string) (uint64, error) {
-	balance, err := c.client.BalanceAt(ctx, common.HexToAddress(address), nil)
-	if err != nil {
-		return 0, fmt.Errorf("failed to get balance: %w", err)
-	}
-
-	return balance.Uint64(), nil
 }
 
 // Transfer sends a transaction to the specified address with the given amount.

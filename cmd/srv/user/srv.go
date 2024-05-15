@@ -51,6 +51,7 @@ func (s *Server) loadServer() {
 
 	s.service.WithProcessors(srv)
 }
+
 func (s *Server) Run(ctx context.Context) {
 	s.service.LoadLogger()
 	s.service.LoadConfig()

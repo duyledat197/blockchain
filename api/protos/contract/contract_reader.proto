@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package contract;
+option go_package = "openmyth/blockchain/idl/pb/contract";
+
+import "google/api/annotations.proto";
+// import "validate/validate.proto";
+import "common/common.proto";
+import "google/protobuf/empty.proto";
+
+service ContractReaderService {
+  rpc GetListApproval(google.protobuf.Empty) returns (GetListApprovalResponse) {
+    option (google.api.http) = {
+      get : "/v1/approvals"
+    };
+  };
+
+  rpc GetListTransfer(google.protobuf.Empty) returns (GetListTransferResponse) {
+    option (google.api.http) = {
+      get : "/v1/transfers"
+    };
+  };
+
+  rpc RetrieveLatestBlock(google.protobuf.Empty)
+      returns (RetrieveLatestBlockResponse) {
+    option (google.api.http) = {
+      get : "/v1/blocks/latest"
+    };
+  }
+
+  rpc RetrieveBalanceOf(RetrieveBalanceOfRequest)
+      returns (RetrieveBalanceOfResponse) {
+    option (google.api.http) = {
+      get : "/v1/addresses/{address}/balances"
+    };
+  }
+};
+
+message GetListApprovalResponse { repeated common.Approval data = 1; }
+
+message GetListTransferResponse { repeated common.Transfer data = 1; }
+
+message RetrieveLatestBlockResponse {
+  uint64 number = 1;
+  uint64 nonce = 2;
+  string hash = 3;
+  uint64 gas_limit = 4;
+  uint64 gas_used = 5;
+  int64 timestamp = 6;
+}
+
+message RetrieveBalanceOfRequest { string address = 1; }
+message RetrieveBalanceOfResponse { uint64 balance = 1; }

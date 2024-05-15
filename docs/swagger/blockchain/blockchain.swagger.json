@@ -1,0 +1,114 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "blockchain/blockchain.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "BlockchainService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/addresses/{address}/balances": {
+      "get": {
+        "operationId": "BlockchainService_RetrieveBalanceOf",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/blockchainRetrieveBalanceOfResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "address",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "BlockchainService"
+        ]
+      }
+    },
+    "/v1/blocks/latest": {
+      "get": {
+        "operationId": "BlockchainService_RetrieveLatestBlock",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/blockchainRetrieveLatestBlockResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "BlockchainService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "blockchainRetrieveBalanceOfResponse": {
+      "type": "object",
+      "properties": {
+        "balance": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "blockchainRetrieveLatestBlockResponse": {
+      "type": "object"
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}

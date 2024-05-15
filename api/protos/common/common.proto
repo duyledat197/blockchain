@@ -3,7 +3,37 @@ syntax = "proto3";
 package common;
 option go_package = "openmyth/blockchain/idl/pb/common";
 
+enum TopicEvent {
+  TOPIC_EVENT_NONE = 0;
+  TOPIC_EVENT_APPROVAL = 1;
+  TOPIC_EVENT_TRANSFER = 2;
+  TOPIC_EVENT_SEND_TRANSACTION = 3;
+}
+
 message User {
   string username = 1;
   string id = 2;
+}
+
+message Approval {
+  string owner = 1;
+  string spender = 2;
+  string value = 3;
+  uint64 block_number = 4;
+  int64 timestamp = 5;
+}
+
+message Transfer {
+  string from = 1;
+  string to = 2;
+  string value = 3;
+  uint64 block_number = 4;
+  int64 timestamp = 5;
+}
+
+message Transaction {
+  string privKey = 1;
+  string from = 2;
+  string to = 3;
+  string amount = 4;
 }

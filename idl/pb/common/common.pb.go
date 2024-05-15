@@ -20,6 +20,58 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type TopicEvent int32
+
+const (
+	TopicEvent_TOPIC_EVENT_NONE             TopicEvent = 0
+	TopicEvent_TOPIC_EVENT_APPROVAL         TopicEvent = 1
+	TopicEvent_TOPIC_EVENT_TRANSFER         TopicEvent = 2
+	TopicEvent_TOPIC_EVENT_SEND_TRANSACTION TopicEvent = 3
+)
+
+// Enum value maps for TopicEvent.
+var (
+	TopicEvent_name = map[int32]string{
+		0: "TOPIC_EVENT_NONE",
+		1: "TOPIC_EVENT_APPROVAL",
+		2: "TOPIC_EVENT_TRANSFER",
+		3: "TOPIC_EVENT_SEND_TRANSACTION",
+	}
+	TopicEvent_value = map[string]int32{
+		"TOPIC_EVENT_NONE":             0,
+		"TOPIC_EVENT_APPROVAL":         1,
+		"TOPIC_EVENT_TRANSFER":         2,
+		"TOPIC_EVENT_SEND_TRANSACTION": 3,
+	}
+)
+
+func (x TopicEvent) Enum() *TopicEvent {
+	p := new(TopicEvent)
+	*p = x
+	return p
+}
+
+func (x TopicEvent) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (TopicEvent) Descriptor() protoreflect.EnumDescriptor {
+	return file_common_common_proto_enumTypes[0].Descriptor()
+}
+
+func (TopicEvent) Type() protoreflect.EnumType {
+	return &file_common_common_proto_enumTypes[0]
+}
+
+func (x TopicEvent) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use TopicEvent.Descriptor instead.
+func (TopicEvent) EnumDescriptor() ([]byte, []int) {
+	return file_common_common_proto_rawDescGZIP(), []int{0}
+}
+
 type User struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -75,6 +127,235 @@ func (x *User) GetId() string {
 	return ""
 }
 
+type Approval struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Owner       string `protobuf:"bytes,1,opt,name=owner,proto3" json:"owner,omitempty"`
+	Spender     string `protobuf:"bytes,2,opt,name=spender,proto3" json:"spender,omitempty"`
+	Value       string `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"`
+	BlockNumber uint64 `protobuf:"varint,4,opt,name=block_number,json=blockNumber,proto3" json:"block_number,omitempty"`
+	Timestamp   int64  `protobuf:"varint,5,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+}
+
+func (x *Approval) Reset() {
+	*x = Approval{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_common_common_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Approval) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Approval) ProtoMessage() {}
+
+func (x *Approval) ProtoReflect() protoreflect.Message {
+	mi := &file_common_common_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Approval.ProtoReflect.Descriptor instead.
+func (*Approval) Descriptor() ([]byte, []int) {
+	return file_common_common_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *Approval) GetOwner() string {
+	if x != nil {
+		return x.Owner
+	}
+	return ""
+}
+
+func (x *Approval) GetSpender() string {
+	if x != nil {
+		return x.Spender
+	}
+	return ""
+}
+
+func (x *Approval) GetValue() string {
+	if x != nil {
+		return x.Value
+	}
+	return ""
+}
+
+func (x *Approval) GetBlockNumber() uint64 {
+	if x != nil {
+		return x.BlockNumber
+	}
+	return 0
+}
+
+func (x *Approval) GetTimestamp() int64 {
+	if x != nil {
+		return x.Timestamp
+	}
+	return 0
+}
+
+type Transfer struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	From        string `protobuf:"bytes,1,opt,name=from,proto3" json:"from,omitempty"`
+	To          string `protobuf:"bytes,2,opt,name=to,proto3" json:"to,omitempty"`
+	Value       string `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"`
+	BlockNumber uint64 `protobuf:"varint,4,opt,name=block_number,json=blockNumber,proto3" json:"block_number,omitempty"`
+	Timestamp   int64  `protobuf:"varint,5,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+}
+
+func (x *Transfer) Reset() {
+	*x = Transfer{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_common_common_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Transfer) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Transfer) ProtoMessage() {}
+
+func (x *Transfer) ProtoReflect() protoreflect.Message {
+	mi := &file_common_common_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Transfer.ProtoReflect.Descriptor instead.
+func (*Transfer) Descriptor() ([]byte, []int) {
+	return file_common_common_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *Transfer) GetFrom() string {
+	if x != nil {
+		return x.From
+	}
+	return ""
+}
+
+func (x *Transfer) GetTo() string {
+	if x != nil {
+		return x.To
+	}
+	return ""
+}
+
+func (x *Transfer) GetValue() string {
+	if x != nil {
+		return x.Value
+	}
+	return ""
+}
+
+func (x *Transfer) GetBlockNumber() uint64 {
+	if x != nil {
+		return x.BlockNumber
+	}
+	return 0
+}
+
+func (x *Transfer) GetTimestamp() int64 {
+	if x != nil {
+		return x.Timestamp
+	}
+	return 0
+}
+
+type Transaction struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	PrivKey string `protobuf:"bytes,1,opt,name=privKey,proto3" json:"privKey,omitempty"`
+	From    string `protobuf:"bytes,2,opt,name=from,proto3" json:"from,omitempty"`
+	To      string `protobuf:"bytes,3,opt,name=to,proto3" json:"to,omitempty"`
+	Amount  string `protobuf:"bytes,4,opt,name=amount,proto3" json:"amount,omitempty"`
+}
+
+func (x *Transaction) Reset() {
+	*x = Transaction{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_common_common_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Transaction) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Transaction) ProtoMessage() {}
+
+func (x *Transaction) ProtoReflect() protoreflect.Message {
+	mi := &file_common_common_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Transaction.ProtoReflect.Descriptor instead.
+func (*Transaction) Descriptor() ([]byte, []int) {
+	return file_common_common_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *Transaction) GetPrivKey() string {
+	if x != nil {
+		return x.PrivKey
+	}
+	return ""
+}
+
+func (x *Transaction) GetFrom() string {
+	if x != nil {
+		return x.From
+	}
+	return ""
+}
+
+func (x *Transaction) GetTo() string {
+	if x != nil {
+		return x.To
+	}
+	return ""
+}
+
+func (x *Transaction) GetAmount() string {
+	if x != nil {
+		return x.Amount
+	}
+	return ""
+}
+
 var File_common_common_proto protoreflect.FileDescriptor
 
 var file_common_common_proto_rawDesc = []byte{
@@ -83,9 +364,41 @@ var file_common_common_proto_rawDesc = []byte{
 	0x04, 0x55, 0x73, 0x65, 0x72, 0x12, 0x1a, 0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d,
 	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d,
 	0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69,
-	0x64, 0x42, 0x23, 0x5a, 0x21, 0x6f, 0x70, 0x65, 0x6e, 0x6d, 0x79, 0x74, 0x68, 0x2f, 0x62, 0x6c,
-	0x6f, 0x63, 0x6b, 0x63, 0x68, 0x61, 0x69, 0x6e, 0x2f, 0x69, 0x64, 0x6c, 0x2f, 0x70, 0x62, 0x2f,
-	0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x64, 0x22, 0x91, 0x01, 0x0a, 0x08, 0x41, 0x70, 0x70, 0x72, 0x6f, 0x76, 0x61, 0x6c, 0x12, 0x14,
+	0x0a, 0x05, 0x6f, 0x77, 0x6e, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x6f,
+	0x77, 0x6e, 0x65, 0x72, 0x12, 0x18, 0x0a, 0x07, 0x73, 0x70, 0x65, 0x6e, 0x64, 0x65, 0x72, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x73, 0x70, 0x65, 0x6e, 0x64, 0x65, 0x72, 0x12, 0x14,
+	0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76,
+	0x61, 0x6c, 0x75, 0x65, 0x12, 0x21, 0x0a, 0x0c, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x5f, 0x6e, 0x75,
+	0x6d, 0x62, 0x65, 0x72, 0x18, 0x04, 0x20, 0x01, 0x28, 0x04, 0x52, 0x0b, 0x62, 0x6c, 0x6f, 0x63,
+	0x6b, 0x4e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x12, 0x1c, 0x0a, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73,
+	0x74, 0x61, 0x6d, 0x70, 0x18, 0x05, 0x20, 0x01, 0x28, 0x03, 0x52, 0x09, 0x74, 0x69, 0x6d, 0x65,
+	0x73, 0x74, 0x61, 0x6d, 0x70, 0x22, 0x85, 0x01, 0x0a, 0x08, 0x54, 0x72, 0x61, 0x6e, 0x73, 0x66,
+	0x65, 0x72, 0x12, 0x12, 0x0a, 0x04, 0x66, 0x72, 0x6f, 0x6d, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x04, 0x66, 0x72, 0x6f, 0x6d, 0x12, 0x0e, 0x0a, 0x02, 0x74, 0x6f, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x02, 0x74, 0x6f, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18,
+	0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x12, 0x21, 0x0a, 0x0c,
+	0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x5f, 0x6e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x18, 0x04, 0x20, 0x01,
+	0x28, 0x04, 0x52, 0x0b, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x4e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x12,
+	0x1c, 0x0a, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x05, 0x20, 0x01,
+	0x28, 0x03, 0x52, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x22, 0x63, 0x0a,
+	0x0b, 0x54, 0x72, 0x61, 0x6e, 0x73, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x18, 0x0a, 0x07,
+	0x70, 0x72, 0x69, 0x76, 0x4b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x70,
+	0x72, 0x69, 0x76, 0x4b, 0x65, 0x79, 0x12, 0x12, 0x0a, 0x04, 0x66, 0x72, 0x6f, 0x6d, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x66, 0x72, 0x6f, 0x6d, 0x12, 0x0e, 0x0a, 0x02, 0x74, 0x6f,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x74, 0x6f, 0x12, 0x16, 0x0a, 0x06, 0x61, 0x6d,
+	0x6f, 0x75, 0x6e, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x61, 0x6d, 0x6f, 0x75,
+	0x6e, 0x74, 0x2a, 0x78, 0x0a, 0x0a, 0x54, 0x6f, 0x70, 0x69, 0x63, 0x45, 0x76, 0x65, 0x6e, 0x74,
+	0x12, 0x14, 0x0a, 0x10, 0x54, 0x4f, 0x50, 0x49, 0x43, 0x5f, 0x45, 0x56, 0x45, 0x4e, 0x54, 0x5f,
+	0x4e, 0x4f, 0x4e, 0x45, 0x10, 0x00, 0x12, 0x18, 0x0a, 0x14, 0x54, 0x4f, 0x50, 0x49, 0x43, 0x5f,
+	0x45, 0x56, 0x45, 0x4e, 0x54, 0x5f, 0x41, 0x50, 0x50, 0x52, 0x4f, 0x56, 0x41, 0x4c, 0x10, 0x01,
+	0x12, 0x18, 0x0a, 0x14, 0x54, 0x4f, 0x50, 0x49, 0x43, 0x5f, 0x45, 0x56, 0x45, 0x4e, 0x54, 0x5f,
+	0x54, 0x52, 0x41, 0x4e, 0x53, 0x46, 0x45, 0x52, 0x10, 0x02, 0x12, 0x20, 0x0a, 0x1c, 0x54, 0x4f,
+	0x50, 0x49, 0x43, 0x5f, 0x45, 0x56, 0x45, 0x4e, 0x54, 0x5f, 0x53, 0x45, 0x4e, 0x44, 0x5f, 0x54,
+	0x52, 0x41, 0x4e, 0x53, 0x41, 0x43, 0x54, 0x49, 0x4f, 0x4e, 0x10, 0x03, 0x42, 0x23, 0x5a, 0x21,
+	0x6f, 0x70, 0x65, 0x6e, 0x6d, 0x79, 0x74, 0x68, 0x2f, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x63, 0x68,
+	0x61, 0x69, 0x6e, 0x2f, 0x69, 0x64, 0x6c, 0x2f, 0x70, 0x62, 0x2f, 0x63, 0x6f, 0x6d, 0x6d, 0x6f,
+	0x6e, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -100,9 +413,14 @@ func file_common_common_proto_rawDescGZIP() []byte {
 	return file_common_common_proto_rawDescData
 }
 
-var file_common_common_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_common_common_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_common_common_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_common_common_proto_goTypes = []interface{}{
-	(*User)(nil), // 0: common.User
+	(TopicEvent)(0),     // 0: common.TopicEvent
+	(*User)(nil),        // 1: common.User
+	(*Approval)(nil),    // 2: common.Approval
+	(*Transfer)(nil),    // 3: common.Transfer
+	(*Transaction)(nil), // 4: common.Transaction
 }
 var file_common_common_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -130,19 +448,56 @@ func file_common_common_proto_init() {
 				return nil
 			}
 		}
+		file_common_common_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Approval); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_common_common_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Transfer); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_common_common_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Transaction); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_common_common_proto_rawDesc,
-			NumEnums:      0,
-			NumMessages:   1,
+			NumEnums:      1,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_common_common_proto_goTypes,
 		DependencyIndexes: file_common_common_proto_depIdxs,
+		EnumInfos:         file_common_common_proto_enumTypes,
 		MessageInfos:      file_common_common_proto_msgTypes,
 	}.Build()
 	File_common_common_proto = out.File

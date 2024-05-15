@@ -28,3 +28,5 @@ test-publisher:
 	go run tests/kafka/publisher/main.go  
 test-subscriber:
 	go run tests/kafka/subscriber/main.go  
+test-mongo:
+	go run tests/mongo/main.go

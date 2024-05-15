@@ -1,0 +1,251 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "contract/contract_reader.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ContractReaderService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/addresses/{address}/balances": {
+      "get": {
+        "operationId": "ContractReaderService_RetrieveBalanceOf",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/contractRetrieveBalanceOfResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "address",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ContractReaderService"
+        ]
+      }
+    },
+    "/v1/approvals": {
+      "get": {
+        "operationId": "ContractReaderService_GetListApproval",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/contractGetListApprovalResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "ContractReaderService"
+        ]
+      }
+    },
+    "/v1/blocks/latest": {
+      "get": {
+        "operationId": "ContractReaderService_RetrieveLatestBlock",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/contractRetrieveLatestBlockResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "ContractReaderService"
+        ]
+      }
+    },
+    "/v1/transfers": {
+      "get": {
+        "operationId": "ContractReaderService_GetListTransfer",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/contractGetListTransferResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "ContractReaderService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "commonApproval": {
+      "type": "object",
+      "properties": {
+        "owner": {
+          "type": "string"
+        },
+        "spender": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        },
+        "blockNumber": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "commonTransfer": {
+      "type": "object",
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        },
+        "blockNumber": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "contractGetListApprovalResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/commonApproval"
+          }
+        }
+      }
+    },
+    "contractGetListTransferResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/commonTransfer"
+          }
+        }
+      }
+    },
+    "contractRetrieveBalanceOfResponse": {
+      "type": "object",
+      "properties": {
+        "balance": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "contractRetrieveLatestBlockResponse": {
+      "type": "object",
+      "properties": {
+        "number": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "nonce": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "hash": {
+          "type": "string"
+        },
+        "gasLimit": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "gasUsed": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}

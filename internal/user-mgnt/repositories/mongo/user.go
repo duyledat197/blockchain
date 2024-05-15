@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 
 	"openmyth/blockchain/internal/user-mgnt/entities"
@@ -47,7 +48,7 @@ func (r *userRepository) Create(ctx context.Context, data *entities.User) error 
 		return err
 	}
 	id := res.InsertedID
-	data.ID = id.(string)
+	data.ID = id.(primitive.ObjectID).Hex()
 
 	return nil
 }

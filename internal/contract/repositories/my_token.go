@@ -9,12 +9,9 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 
 	contract "openmyth/blockchain/idl/contracts"
-	"openmyth/blockchain/pkg/blockchain/block"
 )
 
-type MyTokenRepo interface {
-	RetrieveLatestBlock(ctx context.Context) (*block.Block, error)
-	RetrieveBalanceOf(ctx context.Context, address string) (uint64, error)
+type MyTokenRepository interface {
 	Transfer(ctx context.Context, privKey, fromAddr, toAdrr string, amount *big.Int) error
 	GetContractAddress() common.Address
 	SubscribeFilterLogs(ctx context.Context, q ethereum.FilterQuery, ch chan<- types.Log) (ethereum.Subscription, error)

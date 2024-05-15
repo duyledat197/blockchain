@@ -9,7 +9,9 @@ import (
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"google.golang.org/protobuf/proto"
 
+	pb "openmyth/blockchain/idl/pb/common"
 	"openmyth/blockchain/internal/contract/repositories"
 	"openmyth/blockchain/pkg/iface/processor"
 	"openmyth/blockchain/pkg/iface/pubsub"
@@ -20,7 +22,7 @@ type Watcher interface {
 }
 
 type defaultWatcher struct {
-	myTokenRepo repositories.MyTokenRepo
+	myTokenRepo repositories.MyTokenRepository
 	publisher   pubsub.Publisher
 
 	isRunning bool
@@ -29,7 +31,7 @@ type defaultWatcher struct {
 // NewWatcher creates a new Watcher instance.
 //
 // It takes a *eth.EthClient as a parameter and returns a Watcher.
-func NewWatcher(myTokenRepo repositories.MyTokenRepo, publisher pubsub.Publisher) Watcher {
+func NewWatcher(myTokenRepo repositories.MyTokenRepository, publisher pubsub.Publisher) Watcher {
 	return &defaultWatcher{
 		myTokenRepo: myTokenRepo,
 		publisher:   publisher,
@@ -78,13 +80,17 @@ func (w *defaultWatcher) Stop(_ context.Context) error {
 //
 // It takes a types.Log parameter named evLog and returns an error.
 func (w *defaultWatcher) handleEventLog(evLog types.Log) {
-
 	if approval, err := w.myTokenRepo.ParseApproval(evLog); err == nil && approval != nil {
-		b, err := approval.Raw.MarshalJSON()
+		b, err := proto.Marshal(&pb.Approval{
+			Owner:       approval.Owner.Hex(),
+			Spender:     approval.Spender.Hex(),
+			Value:       approval.Value.String(),
+			BlockNumber: evLog.BlockNumber,
+		})
 		if err != nil {
 			slog.Error("failed to marshal approval", slog.Any("err", err))
 		}
-		if err := w.publisher.Publish(context.Background(), "approval", &pubsub.Pack{
+		if err := w.publisher.Publish(context.Background(), pb.TopicEvent_TOPIC_EVENT_APPROVAL.String(), &pubsub.Pack{
 			Key: approval.Owner.Bytes(),
 			Msg: b,
 		}); err != nil {
@@ -93,11 +99,16 @@ func (w *defaultWatcher) handleEventLog(evLog types.Log) {
 	}
 
 	if transfer, err := w.myTokenRepo.ParseTransfer(evLog); err == nil && transfer != nil {
-		b, err := transfer.Raw.MarshalJSON()
+		b, err := proto.Marshal(&pb.Transfer{
+			From:        transfer.From.Hex(),
+			To:          transfer.To.Hex(),
+			Value:       transfer.Value.String(),
+			BlockNumber: evLog.BlockNumber,
+		})
 		if err != nil {
 			slog.Error("failed to marshal transfer", slog.Any("err", err))
 		}
-		if err := w.publisher.Publish(context.Background(), "approval", &pubsub.Pack{
+		if err := w.publisher.Publish(context.Background(), pb.TopicEvent_TOPIC_EVENT_TRANSFER.String(), &pubsub.Pack{
 			Key: transfer.From.Bytes(),
 			Msg: b,
 		}); err != nil {

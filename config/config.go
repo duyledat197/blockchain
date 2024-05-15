@@ -14,11 +14,13 @@ var cfgFiles embed.FS
 type Config struct {
 	PostgresDB *Database `mapstructure:"postgres_db,omitempty"`
 	MongoDB    *Database `mapstructure:"mongo_db,omitempty"`
-	Kafka      *Database `mapstructure:"kafka,omitempty"`
+	Kafka      *Endpoint `mapstructure:"kafka,omitempty"`
 	ETHClient  *Endpoint `mapstructure:"eth_client,omitempty"`
 
-	UserService    *Endpoint `mapstructure:"user_service,omitempty"`
-	GatewayService *Endpoint `mapstructure:"gateway_service,omitempty"`
+	UserService           *Endpoint `mapstructure:"user_service,omitempty"`
+	GatewayService        *Endpoint `mapstructure:"gateway_service,omitempty"`
+	ContractReaderService *Endpoint `mapstructure:"contract_reader_service,omitempty"`
+	ContractWriterService *Endpoint `mapstructure:"contract_writer_service,omitempty"`
 
 	SymetricKey   string `mapstructure:"symetric_key,omitempty"`
 	FileLogOutPut string `mapstructure:"file_log_out_put,omitempty"`

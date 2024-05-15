@@ -14,7 +14,5 @@ mongo_db:
   port: "27017"
   database: blockchain
 kafka:
-  schema: http
   host: localhost
   port: "9092"
-  database: blockchain

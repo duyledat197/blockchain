@@ -1,17 +1,16 @@
-package contractwriter
+package contractreader
 
 import (
 	"context"
 
-	pb "openmyth/blockchain/idl/pb/common"
+	pb "openmyth/blockchain/idl/pb/contract"
 	"openmyth/blockchain/internal/contract/repositories"
 	"openmyth/blockchain/internal/contract/repositories/eth"
 	"openmyth/blockchain/internal/contract/repositories/mongo"
 	"openmyth/blockchain/internal/contract/services"
 	"openmyth/blockchain/pkg/eth_client"
+	"openmyth/blockchain/pkg/grpc_server"
 	"openmyth/blockchain/pkg/iface/processor"
-	"openmyth/blockchain/pkg/iface/pubsub"
-	"openmyth/blockchain/pkg/kafka"
 	mongoclient "openmyth/blockchain/pkg/mongo_client"
 )
 
@@ -19,13 +18,11 @@ type Server struct {
 	mongoClient *mongoclient.MongoClient
 	ethClient   eth_client.IClient
 
-	subscriber pubsub.Subscriber
+	approvalRepo   repositories.ApprovalRepository
+	transferRepo   repositories.TransferRepository
+	blockchainRepo repositories.BlockchainRepository
 
-	approvalRepo repositories.ApprovalRepository
-	transferRepo repositories.TransferRepository
-	myTokenRepo  repositories.MyTokenRepository
-
-	contractWriter *services.ContractWriterService
+	contractReaderService pb.ContractReaderServiceServer
 
 	service *processor.Service
 }
@@ -53,25 +50,19 @@ func (s *Server) loadEthClient(ctx context.Context) {
 func (s *Server) loadRepositories() {
 	s.approvalRepo = mongo.NewApprovalRepository(s.mongoClient, s.service.Cfg.MongoDB.Database)
 	s.transferRepo = mongo.NewTransferRepository(s.mongoClient, s.service.Cfg.MongoDB.Database)
-	s.myTokenRepo = eth.NewMyTokenRepository(s.ethClient)
+	s.blockchainRepo = eth.NewBlockchainRepository(s.ethClient)
 }
 
 func (s *Server) loadServices() {
-	s.contractWriter = services.NewContractWriterService(s.approvalRepo, s.transferRepo, s.myTokenRepo)
+	s.contractReaderService = services.NewContractReaderService(s.approvalRepo, s.transferRepo, s.blockchainRepo)
 }
 
-func (s *Server) loadSubscriber() {
-	s.subscriber = kafka.NewSubscriber(
-		"contract-writer",
-		[]string{s.service.Cfg.Kafka.Address()},
-		[]string{
-			pb.TopicEvent_TOPIC_EVENT_APPROVAL.String(),
-			pb.TopicEvent_TOPIC_EVENT_TRANSFER.String(),
-			pb.TopicEvent_TOPIC_EVENT_SEND_TRANSACTION.String(),
-		}, s.contractWriter.Subscribe,
-	)
+func (s *Server) loadServer() {
+	srv := grpc_server.NewGrpcServer(s.service.Cfg.ContractReaderService)
 
-	s.service.WithProcessors(s.subscriber)
+	pb.RegisterContractReaderServiceServer(srv, s.contractReaderService)
+
+	s.service.WithProcessors(srv)
 }
 
 func (s *Server) Run(ctx context.Context) {
@@ -82,7 +73,6 @@ func (s *Server) Run(ctx context.Context) {
 	s.loadEthClient(ctx)
 	s.loadRepositories()
 	s.loadServices()
-	s.loadSubscriber()
 
 	s.service.GracefulShutdown(ctx)
 }
