@@ -90,6 +90,38 @@
         ]
       }
     },
+    "/v1/transactions": {
+      "post": {
+        "operationId": "ContractReaderService_SendTransaction",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/contractSendTransactionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/contractSendTransactionRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ContractReaderService"
+        ]
+      }
+    },
     "/v1/transfers": {
       "get": {
         "operationId": "ContractReaderService_GetListTransfer",
@@ -218,6 +250,23 @@
           "format": "int64"
         }
       }
+    },
+    "contractSendTransactionRequest": {
+      "type": "object",
+      "properties": {
+        "privKey": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "string"
+        }
+      }
+    },
+    "contractSendTransactionResponse": {
+      "type": "object"
     },
     "protobufAny": {
       "type": "object",

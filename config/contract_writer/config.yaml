@@ -1,0 +1,14 @@
+eth_client: 
+  host: "http://ganache"
+  port: "8545"
+ws_eth_client:
+  host: "ws://ganache"
+  port: "8546"
+mongo_db:
+  schema: mongodb
+  host: mongodb
+  port: "27017"
+  database: blockchain
+kafka:
+  host: kafka
+  port: "9092"

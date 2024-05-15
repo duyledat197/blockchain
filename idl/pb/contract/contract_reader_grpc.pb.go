@@ -24,6 +24,7 @@ const (
 	ContractReaderService_GetListTransfer_FullMethodName     = "/contract.ContractReaderService/GetListTransfer"
 	ContractReaderService_RetrieveLatestBlock_FullMethodName = "/contract.ContractReaderService/RetrieveLatestBlock"
 	ContractReaderService_RetrieveBalanceOf_FullMethodName   = "/contract.ContractReaderService/RetrieveBalanceOf"
+	ContractReaderService_SendTransaction_FullMethodName     = "/contract.ContractReaderService/SendTransaction"
 )
 
 // ContractReaderServiceClient is the client API for ContractReaderService service.
@@ -34,6 +35,7 @@ type ContractReaderServiceClient interface {
 	GetListTransfer(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetListTransferResponse, error)
 	RetrieveLatestBlock(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*RetrieveLatestBlockResponse, error)
 	RetrieveBalanceOf(ctx context.Context, in *RetrieveBalanceOfRequest, opts ...grpc.CallOption) (*RetrieveBalanceOfResponse, error)
+	SendTransaction(ctx context.Context, in *SendTransactionRequest, opts ...grpc.CallOption) (*SendTransactionResponse, error)
 }
 
 type contractReaderServiceClient struct {
@@ -80,6 +82,15 @@ func (c *contractReaderServiceClient) RetrieveBalanceOf(ctx context.Context, in 
 	return out, nil
 }
 
+func (c *contractReaderServiceClient) SendTransaction(ctx context.Context, in *SendTransactionRequest, opts ...grpc.CallOption) (*SendTransactionResponse, error) {
+	out := new(SendTransactionResponse)
+	err := c.cc.Invoke(ctx, ContractReaderService_SendTransaction_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ContractReaderServiceServer is the server API for ContractReaderService service.
 // All implementations must embed UnimplementedContractReaderServiceServer
 // for forward compatibility
@@ -88,6 +99,7 @@ type ContractReaderServiceServer interface {
 	GetListTransfer(context.Context, *emptypb.Empty) (*GetListTransferResponse, error)
 	RetrieveLatestBlock(context.Context, *emptypb.Empty) (*RetrieveLatestBlockResponse, error)
 	RetrieveBalanceOf(context.Context, *RetrieveBalanceOfRequest) (*RetrieveBalanceOfResponse, error)
+	SendTransaction(context.Context, *SendTransactionRequest) (*SendTransactionResponse, error)
 	mustEmbedUnimplementedContractReaderServiceServer()
 }
 
@@ -106,6 +118,9 @@ func (UnimplementedContractReaderServiceServer) RetrieveLatestBlock(context.Cont
 }
 func (UnimplementedContractReaderServiceServer) RetrieveBalanceOf(context.Context, *RetrieveBalanceOfRequest) (*RetrieveBalanceOfResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RetrieveBalanceOf not implemented")
+}
+func (UnimplementedContractReaderServiceServer) SendTransaction(context.Context, *SendTransactionRequest) (*SendTransactionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendTransaction not implemented")
 }
 func (UnimplementedContractReaderServiceServer) mustEmbedUnimplementedContractReaderServiceServer() {}
 
@@ -192,6 +207,24 @@ func _ContractReaderService_RetrieveBalanceOf_Handler(srv interface{}, ctx conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ContractReaderService_SendTransaction_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SendTransactionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContractReaderServiceServer).SendTransaction(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContractReaderService_SendTransaction_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContractReaderServiceServer).SendTransaction(ctx, req.(*SendTransactionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ContractReaderService_ServiceDesc is the grpc.ServiceDesc for ContractReaderService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -214,6 +247,10 @@ var ContractReaderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RetrieveBalanceOf",
 			Handler:    _ContractReaderService_RetrieveBalanceOf_Handler,
+		},
+		{
+			MethodName: "SendTransaction",
+			Handler:    _ContractReaderService_SendTransaction_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

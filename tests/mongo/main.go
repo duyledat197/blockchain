@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	"openmyth/blockchain/config"
 	"openmyth/blockchain/internal/user-mgnt/entities"
 	"openmyth/blockchain/internal/user-mgnt/repositories/mongo"
 	mongoclient "openmyth/blockchain/pkg/mongo_client"
@@ -12,8 +13,14 @@ import (
 
 func main() {
 	ctx := context.Background()
-	url := "mongodb://localhost:27017"
-	mgoClient := mongoclient.NewMongoClient(url)
+	db := &config.Database{
+		Schema:   "mongodb",
+		Host:     "localhost",
+		Port:     "27017",
+		Database: "blockchain",
+	}
+	log.Println(db.Address())
+	mgoClient := mongoclient.NewMongoClient(db.Address())
 
 	if err := mgoClient.Connect(ctx); err != nil {
 		log.Fatalf("unable to connect: %v", err)

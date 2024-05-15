@@ -73,6 +73,7 @@ func (s *Server) Run(ctx context.Context) {
 	s.loadEthClient(ctx)
 	s.loadRepositories()
 	s.loadServices()
+	s.loadServer()
 
 	s.service.GracefulShutdown(ctx)
 }

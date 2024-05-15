@@ -52,10 +52,12 @@ func (w *defaultWatcher) Start(ctx context.Context) error {
 	logs := make(chan types.Log)
 	sub, err := w.myTokenRepo.SubscribeFilterLogs(ctx, query, logs)
 	if err != nil {
+		log.Print(err)
 		return fmt.Errorf("unable to subscribe filter: %w", err)
 	}
-
+	log.Println("w.isRunning", w.isRunning)
 	for w.isRunning {
+		log.Println("waiting")
 		select {
 		case err := <-sub.Err():
 			log.Fatal(err)

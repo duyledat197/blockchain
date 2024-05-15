@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"log"
 
 	pb "openmyth/blockchain/idl/pb/user"
 	"openmyth/blockchain/internal/user-mgnt/repositories"
@@ -30,6 +31,7 @@ func NewServer() *Server {
 }
 
 func (s *Server) loadDatabases() {
+	log.Println("s.service.Cfg.MongoDB.Address()", s.service.Cfg.MongoDB.Address())
 	s.mongoClient = mongoclient.NewMongoClient(s.service.Cfg.MongoDB.Address())
 
 	s.service.WithFactories(s.mongoClient)

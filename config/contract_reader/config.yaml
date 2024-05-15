@@ -1,0 +1,14 @@
+eth_client: 
+  host: "http://ganache"
+  port: "8545"
+contract_reader_service:
+  host: ""
+  port: "5002"
+mongo_db:
+  schema: mongodb
+  host: mongodb
+  port: "27017"
+  database: contract
+kafka:
+  host: kafka
+  port: "9092"

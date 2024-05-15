@@ -15,10 +15,11 @@ func getSecret() string {
 	if secretKey != "" {
 		secretKey = os.Getenv("JWT_SECRET_KEY")
 	}
+
 	return secretKey
 }
 
-// Generate generates a JWT token with the given payload and expiration time.
+// GenerateToken generates a JWT token with the given payload and expiration time.
 //
 // Parameters:
 // - payload: The payload containing the claims for the JWT token.
@@ -39,7 +40,7 @@ func GenerateToken(payload *jwt.StandardClaims, expirationTime time.Duration) (s
 
 }
 
-// Verify verifies the JWT token.
+// VerifyToken verifies the JWT token.
 //
 // It takes a token string as a parameter and returns *jwt.StandardClaims and error.
 func VerifyToken(token string) (*jwt.StandardClaims, error) {

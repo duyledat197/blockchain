@@ -34,6 +34,14 @@ service ContractReaderService {
       get : "/v1/addresses/{address}/balances"
     };
   }
+
+  rpc SendTransaction(SendTransactionRequest)
+      returns (SendTransactionResponse) {
+    option (google.api.http) = {
+      post : "/v1/transactions"
+      body : "*"
+    };
+  }
 };
 
 message GetListApprovalResponse { repeated common.Approval data = 1; }
@@ -51,3 +59,11 @@ message RetrieveLatestBlockResponse {
 
 message RetrieveBalanceOfRequest { string address = 1; }
 message RetrieveBalanceOfResponse { uint64 balance = 1; }
+
+message SendTransactionRequest {
+  string priv_key = 1;
+  string to = 2;
+  string amount = 3;
+}
+
+message SendTransactionResponse {}

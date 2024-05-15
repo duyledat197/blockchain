@@ -1,0 +1,8 @@
+user_service:
+  host: ""
+  port: "5001"
+mongo_db:
+  schema: mongodb
+  host: mongodb
+  port: "27017"
+  database: user

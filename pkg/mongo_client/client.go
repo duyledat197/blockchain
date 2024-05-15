@@ -2,7 +2,7 @@ package mongoclient
 
 import (
 	"context"
-	"log/slog"
+	"log"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -26,6 +26,9 @@ func NewMongoClient(connectString string) *MongoClient {
 // It takes a context.Context parameter for managing the operation's deadline.
 // Returns an error if the connection attempt fails.
 func (m *MongoClient) Connect(ctx context.Context) error {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	log.Println("Connecting to MongoDB...")
 	clientOpts := options.Client()
 	clientOpts.ApplyURI(m.connectString)
 	clientOpts.SetConnectTimeout(10 * time.Second)
@@ -40,7 +43,7 @@ func (m *MongoClient) Connect(ctx context.Context) error {
 		return err
 	}
 
-	slog.Info("Connected to MongoDB!!")
+	log.Print("Connected to MongoDB!!")
 
 	m.Client = client
 

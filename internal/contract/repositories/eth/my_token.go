@@ -5,7 +5,6 @@ import (
 	"log"
 	"log/slog"
 	"math/big"
-	"os"
 
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -20,13 +19,14 @@ import (
 
 type MyTokenRepo struct {
 	client          eth_client.IClient
+	wsclient        eth_client.IClient
 	contractAddress common.Address
 	contract        *contract.MyToken
 }
 
 // NewMyTokenRepository initializes a new Ethereum client.
-func NewMyTokenRepository(client eth_client.IClient) repositories.MyTokenRepository {
-	contractAddr := common.HexToAddress(os.Getenv("CONTRACT_ADDRESS"))
+func NewMyTokenRepository(client eth_client.IClient, wsclient eth_client.IClient, contractAddress string) repositories.MyTokenRepository {
+	contractAddr := common.HexToAddress(contractAddress)
 	contract, err := contract.NewMyToken(contractAddr, client)
 	if err != nil {
 		log.Fatalf("unable to create ERC20 instance: %v", err)
@@ -34,6 +34,7 @@ func NewMyTokenRepository(client eth_client.IClient) repositories.MyTokenReposit
 
 	return &MyTokenRepo{
 		client:          client,
+		wsclient:        wsclient,
 		contractAddress: contractAddr,
 		contract:        contract,
 	}
@@ -93,7 +94,7 @@ func (c *MyTokenRepo) GetContractAddress() common.Address {
 }
 
 func (c *MyTokenRepo) SubscribeFilterLogs(ctx context.Context, q ethereum.FilterQuery, ch chan<- types.Log) (ethereum.Subscription, error) {
-	return c.client.SubscribeFilterLogs(ctx, q, ch)
+	return c.wsclient.SubscribeFilterLogs(ctx, q, ch)
 }
 
 func (c *MyTokenRepo) FilterLogs(ctx context.Context, q ethereum.FilterQuery) ([]types.Log, error) {

@@ -1,0 +1,9 @@
+gateway_service:
+  host: ""
+  port: "5000"
+user_service:
+  host: "user"
+  port: "5001"
+contract_reader_service:
+  host: "contract_reader"
+  port: "5002"

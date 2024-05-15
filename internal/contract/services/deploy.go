@@ -18,8 +18,9 @@ import (
 )
 
 type DeployContractService struct {
-	client  eth_client.IClient
-	privKey *ecdsa.PrivateKey
+	client     eth_client.IClient
+	privKey    *ecdsa.PrivateKey
+	privKeyStr string
 }
 
 func NewDeployContractService(
@@ -31,8 +32,9 @@ func NewDeployContractService(
 		log.Fatal(err)
 	}
 	return &DeployContractService{
-		client:  client,
-		privKey: privateKey,
+		client:     client,
+		privKey:    privateKey,
+		privKeyStr: privKey,
 	}
 }
 func (d *DeployContractService) Start(ctx context.Context) error {
@@ -46,13 +48,14 @@ func (d *DeployContractService) Start(ctx context.Context) error {
 
 	b, err := yaml.Marshal(map[string]string{
 		"contract_address": contractAddress.Hex(),
+		"private_key":      d.privKeyStr,
 	})
 	if err != nil {
 		return fmt.Errorf("Failed to marshal contract address: %v", err)
 	}
 
 	// wite to config package for later use
-	if err := os.WriteFile("./config/contract_address.yaml", b, os.ModePerm); err != nil {
+	if err := os.WriteFile("./config/common/config.yaml", b, os.ModePerm); err != nil {
 		return fmt.Errorf("failed to write contract address: %v", err)
 	}
 

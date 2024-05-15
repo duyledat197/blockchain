@@ -629,3 +629,213 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RetrieveBalanceOfResponseValidationError{}
+
+// Validate checks the field values on SendTransactionRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SendTransactionRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SendTransactionRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SendTransactionRequestMultiError, or nil if none found.
+func (m *SendTransactionRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SendTransactionRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for PrivKey
+
+	// no validation rules for To
+
+	// no validation rules for Amount
+
+	if len(errors) > 0 {
+		return SendTransactionRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// SendTransactionRequestMultiError is an error wrapping multiple validation
+// errors returned by SendTransactionRequest.ValidateAll() if the designated
+// constraints aren't met.
+type SendTransactionRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SendTransactionRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SendTransactionRequestMultiError) AllErrors() []error { return m }
+
+// SendTransactionRequestValidationError is the validation error returned by
+// SendTransactionRequest.Validate if the designated constraints aren't met.
+type SendTransactionRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SendTransactionRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SendTransactionRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SendTransactionRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SendTransactionRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SendTransactionRequestValidationError) ErrorName() string {
+	return "SendTransactionRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SendTransactionRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSendTransactionRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SendTransactionRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SendTransactionRequestValidationError{}
+
+// Validate checks the field values on SendTransactionResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SendTransactionResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SendTransactionResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SendTransactionResponseMultiError, or nil if none found.
+func (m *SendTransactionResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SendTransactionResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return SendTransactionResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// SendTransactionResponseMultiError is an error wrapping multiple validation
+// errors returned by SendTransactionResponse.ValidateAll() if the designated
+// constraints aren't met.
+type SendTransactionResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SendTransactionResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SendTransactionResponseMultiError) AllErrors() []error { return m }
+
+// SendTransactionResponseValidationError is the validation error returned by
+// SendTransactionResponse.Validate if the designated constraints aren't met.
+type SendTransactionResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SendTransactionResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SendTransactionResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SendTransactionResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SendTransactionResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SendTransactionResponseValidationError) ErrorName() string {
+	return "SendTransactionResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SendTransactionResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSendTransactionResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SendTransactionResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SendTransactionResponseValidationError{}

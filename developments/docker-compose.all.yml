@@ -1,0 +1,107 @@
+version: "3.4"
+
+services:
+  # gateway service
+  gateway:
+    image: openmyth/blockchain
+    ports:
+      - "5000:5000"
+    command: gateway
+    environment:
+      SERVICE: gateway
+    depends_on:
+      - user
+      - contract_reader
+  # user service
+  user:
+    image: openmyth/blockchain
+    ports:
+      - "5001:5001"
+    command: user
+    environment:
+      SERVICE: user
+    depends_on:
+      - mongodb
+
+  # watcher service
+  watcher:
+    image: openmyth/blockchain
+    command: watcher
+    environment:
+      SERVICE: watcher
+    depends_on:
+      - ganache
+      - kafka
+
+  # contact_writer service
+  contract_writer:
+    image: openmyth/blockchain
+    command: contractWriter
+    environment:
+      SERVICE: contract_writer
+    depends_on:
+      - mongodb
+      - kafka
+
+  # contract_reader service
+  contract_reader:
+    image: openmyth/blockchain
+    ports:
+      - "5002:5002"
+    command: contractReader
+    environment:
+      SERVICE: contract_reader
+    depends_on:
+      - mongodb
+      - kafka
+
+  ################## infrstructure #######################
+  kafka:
+    image: apache/kafka:latest
+    hostname: kafka
+    container_name: kafka
+    ports:
+      - '9092:9092'
+      - '19092:19092'
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT_HOST://kafka:9092,PLAINTEXT://kafka:19092'
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:29093'
+      KAFKA_LISTENERS: 'CONTROLLER://:29093,PLAINTEXT_HOST://:9092,PLAINTEXT://:19092'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      CLUSTER_ID: '4L6g3nShT-eMCtK--X86sw'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - 8080:8080
+    depends_on:
+      - kafka
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+
+  ganache:
+    image: trufflesuite/ganache:latest
+    ports:
+      - "8545:8545"
+      - "8546:8546"
+    volumes:
+      - ./ganache_data:/ganache_data
+
+  mongodb:
+    hostname: mongodb
+    image: mongo
+    volumes:
+      - ./mongo-volume:/data/db
+    ports:
+      - "27017:27017"
+    restart: always

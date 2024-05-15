@@ -12,7 +12,8 @@ import (
 )
 
 type BlockchainRepo struct {
-	client eth_client.IClient
+	client   eth_client.IClient
+	wsClient eth_client.IClient
 }
 
 // NewBlockchainRepository initializes a new Ethereum client.

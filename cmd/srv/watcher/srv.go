@@ -2,6 +2,7 @@ package watcher
 
 import (
 	"context"
+	"log"
 
 	"github.com/google/uuid"
 
@@ -21,8 +22,9 @@ type Server struct {
 
 	service *processor.Service
 
-	ethClient eth_client.IClient
-	watcher   watcher.Watcher
+	ethClient   eth_client.IClient
+	wsEthClient eth_client.IClient
+	watcher     watcher.Watcher
 }
 
 func NewServer() *Server {
@@ -39,15 +41,17 @@ func (s *Server) loadPublisher() {
 }
 
 func (s *Server) loadRepositories() {
-	s.myTokenRepo = eth.NewMyTokenRepository(s.ethClient)
+	log.Print("s.service.Cfg.ContractAddress", s.service.Cfg.ContractAddress)
+	s.myTokenRepo = eth.NewMyTokenRepository(s.ethClient, s.wsEthClient, s.service.Cfg.ContractAddress)
 }
 
 func (s *Server) loadEthClient(ctx context.Context) {
 	cfg := s.service.Cfg
 
 	s.ethClient = eth_client.NewDialClient(cfg.ETHClient.Address())
+	s.wsEthClient = eth_client.NewDialClient(cfg.WsETHClient.Address())
 
-	s.service.WithFactories(s.ethClient)
+	s.service.WithFactories(s.ethClient, s.wsEthClient)
 }
 
 func (s *Server) loadServices() {

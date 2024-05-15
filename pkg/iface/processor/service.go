@@ -42,7 +42,7 @@ func (s *Service) LoadLogger() {
 		slogHandler = slog.NewJSONHandler(f, nil)
 	default:
 		slogHandler = tint.NewHandler(os.Stdout, &tint.Options{})
-		slog.SetLogLoggerLevel(slog.LevelDebug)
+		// slog.SetLogLoggerLevel(slog.LevelDebug)
 	}
 
 	logger := slog.New(slogHandler)

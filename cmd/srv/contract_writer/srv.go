@@ -2,6 +2,7 @@ package contractwriter
 
 import (
 	"context"
+	"log"
 
 	pb "openmyth/blockchain/idl/pb/common"
 	"openmyth/blockchain/internal/contract/repositories"
@@ -18,6 +19,7 @@ import (
 type Server struct {
 	mongoClient *mongoclient.MongoClient
 	ethClient   eth_client.IClient
+	wsEthClient eth_client.IClient
 
 	subscriber pubsub.Subscriber
 
@@ -46,14 +48,15 @@ func (s *Server) loadEthClient(ctx context.Context) {
 	cfg := s.service.Cfg
 
 	s.ethClient = eth_client.NewDialClient(cfg.ETHClient.Address())
+	s.wsEthClient = eth_client.NewDialClient(cfg.WsETHClient.Address())
 
-	s.service.WithFactories(s.ethClient)
+	s.service.WithFactories(s.ethClient, s.wsEthClient)
 }
 
 func (s *Server) loadRepositories() {
 	s.approvalRepo = mongo.NewApprovalRepository(s.mongoClient, s.service.Cfg.MongoDB.Database)
 	s.transferRepo = mongo.NewTransferRepository(s.mongoClient, s.service.Cfg.MongoDB.Database)
-	s.myTokenRepo = eth.NewMyTokenRepository(s.ethClient)
+	s.myTokenRepo = eth.NewMyTokenRepository(s.ethClient, s.wsEthClient, s.service.Cfg.PrivateKey)
 }
 
 func (s *Server) loadServices() {
@@ -61,6 +64,7 @@ func (s *Server) loadServices() {
 }
 
 func (s *Server) loadSubscriber() {
+	log.Println("s.service.Cfg.Kafka.Address()", s.service.Cfg.Kafka.Address())
 	s.subscriber = kafka.NewSubscriber(
 		"contract-writer",
 		[]string{s.service.Cfg.Kafka.Address()},

@@ -2,6 +2,7 @@ package grpc_client
 
 import (
 	"context"
+	"log/slog"
 	"time"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -55,6 +56,8 @@ func (c *GrpcClient) Connect(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+
+	slog.Info("connect to %s success!", c.cfg.Port)
 
 	c.ClientConn = conn
 

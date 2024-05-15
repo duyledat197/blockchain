@@ -1,0 +1,4 @@
+eth_client: 
+  host: "http://localhost"
+  port: "8545"
+private_key: 84915c95387f0f173d090a248b7bc022269698b27f6d04bc1e468233df294761

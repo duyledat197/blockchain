@@ -3,6 +3,7 @@ package kafka
 import (
 	"context"
 	"log"
+	"log/slog"
 
 	"github.com/IBM/sarama"
 
@@ -24,7 +25,7 @@ func NewSubscriber(
 	handler pubsub.SubscribeHandler,
 ) pubsub.Subscriber {
 	config := sarama.NewConfig()
-	config.Consumer.Group.Rebalance.Strategy = sarama.BalanceStrategyRoundRobin
+	config.Consumer.Group.Rebalance.Strategy = sarama.NewBalanceStrategyRoundRobin()
 	config.Consumer.Offsets.Initial = sarama.OffsetNewest
 
 	client, err := sarama.NewConsumerGroup(brokerAddrs, groupID, config)
@@ -56,7 +57,7 @@ func (g *subscriber) Start(ctx context.Context) error {
 			// TODO: server-side rebalance happens, the consumer session will need to be
 			// TODO: recreated to get the new claims
 			if err := g.client.Consume(ctx, g.topics, &consumer); err != nil {
-				log.Panicf("Error from consumer: %v", err)
+				log.Print("Error from consumer", slog.Any("error", err))
 			}
 			if ctx.Err() != nil {
 				return

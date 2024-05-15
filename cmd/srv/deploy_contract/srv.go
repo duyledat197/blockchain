@@ -43,6 +43,9 @@ func (s *Server) Run(ctx context.Context) {
 	s.loadEthClient(ctx)
 
 	s.loadServices(ctx)
+	s.ethClient.Connect(ctx)
 
-	s.service.GracefulShutdown(ctx)
+	defer s.ethClient.Close(ctx)
+	s.deployContract.Start(ctx)
+	defer s.deployContract.Stop(ctx)
 }

@@ -36,7 +36,8 @@ func (s *Server) loadClients() {
 	s.authClient = userPb.NewAuthServiceClient(userConn)
 	s.contractReaderClient = contractPb.NewContractReaderServiceClient(contractReaderConn)
 
-	s.service.WithFactories(userConn, contractReaderConn)
+	s.service.WithFactories(userConn, contractReaderConn) // contractReaderConn,
+
 }
 
 func (s *Server) loadServer(ctx context.Context) {

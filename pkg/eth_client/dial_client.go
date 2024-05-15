@@ -3,6 +3,7 @@ package eth_client
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -30,6 +31,8 @@ func (c *DialClient) Connect(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("unable to connect to Ethereum client: %w", err)
 	}
+
+	slog.Info("connect to eth chain success!")
 	c.Client = client
 
 	return nil
