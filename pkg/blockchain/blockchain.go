@@ -16,9 +16,6 @@ type Blockchain struct {
 }
 
 // NewBlockchain creates a new Blockchain object with a genesis block.
-//
-// Returns:
-// - A pointer to the newly created Blockchain object.
 func NewBlockchain() *Blockchain {
 	return &Blockchain{
 		Mutex:  &sync.Mutex{},
@@ -27,12 +24,6 @@ func NewBlockchain() *Blockchain {
 }
 
 // AddBlock adds a new block to the blockchain.
-//
-// Parameters:
-// - data: The data to be included in the new block.
-//
-// Return:
-// None.
 func (bc *Blockchain) AddBlock(block *block.Block) error {
 
 	latestBlock := bc.GetLatestBlock()
@@ -63,9 +54,6 @@ func (bc *Blockchain) AddBlock(block *block.Block) error {
 // The function then retrieves the latest block from the blockchain's blocks slice
 // by accessing the last element. Finally, it releases the lock and returns the
 // latest block.
-//
-// Returns:
-// - *block.Block: The latest block in the blockchain.
 func (bc *Blockchain) GetLatestBlock() *block.Block {
 	bc.Lock()
 	defer bc.Unlock()
@@ -76,9 +64,6 @@ func (bc *Blockchain) GetLatestBlock() *block.Block {
 // ValidateAllBlocks checks the validity of all blocks in the blockchain.
 //
 // It acquires a lock on the blockchain to ensure thread safety. Then, it iterates over each block in the blockchain, starting from the second block. For each block, it checks if the block's index is valid (equal to the current iteration index), if the previous block's hash matches the current block's previous block hash, and if the proof of work for the current block is valid. If any of these checks fail, it returns false. Finally, if all blocks pass the checks, it returns true.
-//
-// Returns:
-// - bool: True if all blocks in the blockchain are valid, false otherwise.
 func (bc *Blockchain) ValidateAllBlocks() bool {
 	bc.Lock()
 	defer bc.Unlock()
@@ -107,9 +92,6 @@ func (bc *Blockchain) ValidateAllBlocks() bool {
 //
 // It acquires a lock on the blockchain to ensure thread safety.
 // The function then returns the slice of blocks in the blockchain.
-//
-// Returns:
-// - []*block.Block: The slice of blocks in the blockchain.
 func (bc *Blockchain) GetBlocks() []*block.Block {
 	bc.Lock()
 	defer bc.Unlock()

@@ -10,6 +10,7 @@ type Approval struct {
 	BlockNumber uint64 `bson:"block_number,omitempty" json:"block_number,omitempty"`
 }
 
+// TableName returns the name of the table for Approval entities.
 func (x *Approval) TableName() string {
 	return "approvals"
 }

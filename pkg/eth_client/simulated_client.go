@@ -19,9 +19,6 @@ type SimulatedClient struct {
 }
 
 // NewSimulatedClient initializes a new SimulatedClient with the given private key.
-//
-// privKey string
-// IClient
 func NewSimulatedClient(privKey string) IClient {
 	privateKey, err := crypto.HexToECDSA(privKey)
 	if err != nil {
@@ -34,10 +31,7 @@ func NewSimulatedClient(privKey string) IClient {
 }
 
 // Connect connects the simulated client to a backend with a specified genesis allocation.
-//
-// ctx context.Context
-// error
-func (c *SimulatedClient) Connect(ctx context.Context) error {
+func (c *SimulatedClient) Connect(_ context.Context) error {
 	publicKey := c.privateKey.Public()
 	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
 	if !ok {
@@ -62,6 +56,7 @@ func (c *SimulatedClient) Connect(ctx context.Context) error {
 	return nil
 }
 
-func (c *SimulatedClient) Close(ctx context.Context) error {
+// Close closes the simulated client with the provided context.
+func (c *SimulatedClient) Close(_ context.Context) error {
 	return nil
 }

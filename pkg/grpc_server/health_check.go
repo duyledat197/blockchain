@@ -6,7 +6,7 @@ import (
 	pb "google.golang.org/grpc/health/grpc_health_v1"
 )
 
-// NewHealthService ...
+// NewHealthService returns a new HealthService.
 func NewHealthService() pb.HealthServer {
 	return &healthService{}
 }

@@ -36,6 +36,8 @@ func NewMyTokenRepository(client eth_client.IClient, wsClient eth_client.IClient
 		contractAddress: contractAddr,
 	}
 }
+
+// getContract returns the MyToken contract instance. If the contract has not been initialized, it creates a new instance.
 func (c *MyTokenRepo) getContract() *contract.MyToken {
 	if c.contract == nil {
 		contr, err := contract.NewMyToken(c.contractAddress, c.client)
@@ -56,7 +58,7 @@ func (c *MyTokenRepo) getContract() *contract.MyToken {
 // - privKey: The private key used for signing the transaction.
 // - toAddr: The address to which the transaction is sent.
 // - amount: The amount of cryptocurrency to send in the transaction.
-// Return type: error, indicating any error that occurred during the transaction.
+// It return an error indicating any error that occurred during the transaction.
 func (c *MyTokenRepo) Transfer(ctx context.Context, privKey, toAdrr string, amount *big.Int) error {
 	if err := retry(3, 1*time.Second, func() error {
 		privateKey, err := crypto.HexToECDSA(privKey)
@@ -94,56 +96,33 @@ func (c *MyTokenRepo) Transfer(ctx context.Context, privKey, toAdrr string, amou
 }
 
 // GetContractAddress returns the contract address associated with the MyToken repository.
-//
-// No parameters.
-// Return type: common.Address.
 func (c *MyTokenRepo) GetContractAddress() common.Address {
 	return c.contractAddress
 }
 
 // SubscribeFilterLogs subscribes to filter logs based on the provided filter query and channel.
-//
-// - ctx: The context.Context object for cancellation and timeouts.
-// - q: The ethereum.FilterQuery object specifying the filter criteria.
-// - ch: The channel to which the filtered logs are sent.
-// Return type: An ethereum.Subscription and an error, indicating any error that occurred during subscription.
+// It returns an ethereum.Subscription and an error, indicating any error that occurred during subscription.
 func (c *MyTokenRepo) SubscribeFilterLogs(ctx context.Context, q ethereum.FilterQuery, ch chan<- types.Log) (ethereum.Subscription, error) {
 	return c.wsClient.SubscribeFilterLogs(ctx, q, ch)
 }
 
 // FilterLogs retrieves the logs that satisfy the given filter query.
-//
-// Parameters:
-// - ctx: The context.Context object for cancellation and timeouts.
-// - q: The ethereum.FilterQuery object specifying the filter criteria.
-// Return type: A slice of types.Log and an error, indicating any error that occurred during the retrieval.
+// It returns a slice of types.Log and an error, indicating any error that occurred during the retrieval.
 func (c *MyTokenRepo) FilterLogs(ctx context.Context, q ethereum.FilterQuery) ([]types.Log, error) {
 	return c.wsClient.FilterLogs(ctx, q)
 }
 
 // ParseApproval parses the approval log and returns the parsed MyTokenApproval struct and an error if any.
-//
-// Parameters:
-// - log: The log to be parsed.
-// Return type: *contract.MyTokenApproval, error
 func (c *MyTokenRepo) ParseApproval(log types.Log) (*contract.MyTokenApproval, error) {
 	return c.getContract().ParseApproval(log)
 }
 
 // ParseTransfer parses the transfer log and returns the parsed MyTokenTransfer struct and an error if any.
-//
-// Parameters:
-// - log: The log to be parsed.
-// Return type: *contract.MyTokenTransfer, error
 func (c *MyTokenRepo) ParseTransfer(log types.Log) (*contract.MyTokenTransfer, error) {
 	return c.getContract().ParseTransfer(log)
 }
 
 // BalanceOf retrieves the balance of the specified address.
-//
-// Parameters:
-// - addr: The address for which the balance is retrieved.
-// Return type: (*big.Int, error)
 func (c *MyTokenRepo) BalanceOf(addr common.Address) (*big.Int, error) {
 	return c.getContract().BalanceOf(&bind.CallOpts{}, addr)
 }

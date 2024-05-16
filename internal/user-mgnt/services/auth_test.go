@@ -19,6 +19,7 @@ import (
 )
 
 func Test_authService_Register(t *testing.T) {
+	t.Parallel()
 	publisher := mocks.NewPublisher(t)
 	type fields struct {
 		userRepo  *mocks.UserRepository
@@ -102,6 +103,7 @@ func Test_authService_Register(t *testing.T) {
 }
 
 func Test_authService_Login(t *testing.T) {
+	t.Parallel()
 	type fields struct {
 		userRepo *mocks.UserRepository
 		wg       *sync.WaitGroup

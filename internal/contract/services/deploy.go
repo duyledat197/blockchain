@@ -25,6 +25,8 @@ type DeployContractService struct {
 	privKeyStr string
 }
 
+// NewDeployContractService creates a new DeployContractService instance.
+// It takes an Ethereum client and a private key as parameters and returns a pointer to the DeployContractService.
 func NewDeployContractService(
 	client eth_client.IClient,
 	privKey string,
@@ -41,9 +43,6 @@ func NewDeployContractService(
 }
 
 // Start deploys a contract and writes its address to a config file.
-//
-// ctx: The context.Context for cancellation and timeouts.
-// error: An error if the deployment or file writing fails.
 func (d *DeployContractService) Start(ctx context.Context) error {
 
 	contractAddress, err := d.deployMyTokenContract(ctx)
@@ -74,14 +73,12 @@ func (d *DeployContractService) Start(ctx context.Context) error {
 }
 
 // Stop stops the DeployContractService gracefully.
-//
-// ctx: The context.Context for cancellation and timeouts.
-// Return type: An error.
 func (d *DeployContractService) Stop(_ context.Context) error {
 	return nil
 }
 
-// - error: An error if the deployment fails.
+// deployMyTokenContract deploys a MyToken contract using the provided context.
+// It returns the contract address and an error if the deployment fails.
 func (d *DeployContractService) deployMyTokenContract(ctx context.Context) (*common.Address, error) {
 	chainID, err := d.client.ChainID(ctx)
 	if err != nil {

@@ -57,12 +57,6 @@ func (m *Miner) Mine(broadcast chan *block.Block) error {
 // It takes a byte slice of data as input and returns a pointer to a new block.Block object.
 // The new block is created with an index incremented by 1 from the latest block's index,
 // the provided data, and the hash of the latest block.
-//
-// Parameters:
-// - data: A byte slice of data to be included in the new block.
-//
-// Returns:
-// - *block.Block: A pointer to the newly created block.Block object.
 func (m *Miner) prepareBlock(data []byte) *block.Block {
 	latestBlock := m.bc.GetLatestBlock()
 
@@ -70,9 +64,6 @@ func (m *Miner) prepareBlock(data []byte) *block.Block {
 }
 
 // GetBlockChain returns the blockchain associated with the Miner.
-//
-// No parameters.
-// Returns a blockchain.Blockchain.
 func (m *Miner) GetBlockChain() blockchain.Blockchain {
 	return m.bc
 }

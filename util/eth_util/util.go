@@ -20,10 +20,6 @@ import (
 )
 
 // PublicKeyBytesToAddress converts a public key bytes slice to an Ethereum address.
-//
-// Parameters:
-// - publicKey: The public key bytes slice to convert.
-// Return type: common.Address.
 func PublicKeyBytesToAddress(publicKey []byte) common.Address {
 	var buf []byte
 
@@ -36,12 +32,6 @@ func PublicKeyBytesToAddress(publicKey []byte) common.Address {
 }
 
 // IsAddressContract checks if the given address corresponds to a smart contract on the Ethereum blockchain.
-//
-// Parameters:
-// - client: The Ethereum client used to interact with the blockchain.
-// - ctx: The context for the function.
-// - addr: The address to be checked.
-// Return type: bool indicating if the address is a contract, error if any error occurs during the check.
 func IsAddressContract(ctx context.Context, client eth_client.IClient, addr string) (bool, error) {
 	address := common.HexToAddress(addr)
 	bytecode, err := client.CodeAt(ctx, address, nil) // nil is latest block
@@ -155,8 +145,8 @@ func SigRSV(isig interface{}) ([32]byte, [32]byte, uint8) {
 	return R, S, V
 }
 
+// VerifySignature verifies a signature using the provided private key, signature, and nonce.
 func VerifySignature(hexPrivateKey, signatureStr, nonce string) bool {
-
 	privateKey, err := crypto.HexToECDSA(hexPrivateKey)
 	if err != nil {
 		return false

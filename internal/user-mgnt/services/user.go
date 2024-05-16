@@ -19,6 +19,7 @@ type userService struct {
 	pb.UnimplementedUserServiceServer
 }
 
+// NewUserService initializes a new UserServiceServer with the provided user repository.
 func NewUserService(userRepo repositories.UserRepository) pb.UserServiceServer {
 	return &userService{
 		userRepo: userRepo,
@@ -26,10 +27,6 @@ func NewUserService(userRepo repositories.UserRepository) pb.UserServiceServer {
 }
 
 // GetUserByID retrieves a user by ID.
-//
-// ctx: the context of the request.
-// req: the request containing the user ID.
-// Returns the user and an error.
 func (s *userService) GetUserByID(ctx context.Context, req *pb.GetUserByIDRequest) (*pb.GetUserByIDResponse, error) {
 	u, err := s.userRepo.FindUser(ctx, req.GetUserId())
 	if err != nil {
@@ -45,10 +42,6 @@ func (s *userService) GetUserByID(ctx context.Context, req *pb.GetUserByIDReques
 }
 
 // GetUserPrivateKeyByID retrieves the private key of a user by user ID.
-//
-// ctx: the context of the request.
-// req: the request containing the user ID.
-// Returns the user's private key and an error.
 func (s *userService) GetUserPrivateKeyByID(ctx context.Context, req *pb.GetUserPrivateKeyByIDRequest) (*pb.GetUserPrivateKeyByIDResponse, error) {
 	u, err := s.userRepo.FindUser(ctx, req.GetUserId())
 	if err != nil {
@@ -76,6 +69,8 @@ func (s *userService) UpdateUser(_ context.Context, _ *pb.UpdateUserRequest) (*p
 	panic("not implemented") // TODO: Implement
 }
 
+// userToPb converts an entities.User to a commonPb.User.
+// It takes an entities.User pointer as a parameter and returns a commonPb.User pointer.
 func userToPb(e *entities.User) *commonPb.User {
 	return &commonPb.User{
 		Username:      e.UserName,

@@ -30,7 +30,12 @@ test-subscriber:
 	go run tests/kafka/subscriber/main.go 
 test-mongo:
 	go run tests/mongo/main.go
+test-ganache:
+	go run tests/ganache/main.go
+
+unit-test:
+	go test ./...
 
 
 start-blockchain-algorithm:
-	go run tests/blockchain/main.go
+	go run main.go blockchainAlgorithm

@@ -17,11 +17,6 @@ import (
 )
 
 // ContractWriterService is responsible for managing the logic for writing contracts.
-//
-// Fields:
-// - approvalRepo: The approval repository used by the ContractWriterService.
-// - transferRepo: The transfer repository used by the ContractWriterService.
-// - myTokenRepo: The MyToken repository used by the ContractWriterService.
 type ContractWriterService struct {
 	approvalRepo   repositories.ApprovalRepository
 	transferRepo   repositories.TransferRepository
@@ -30,12 +25,6 @@ type ContractWriterService struct {
 }
 
 // NewContractWriterService initializes a new ContractWriterService with the provided approval repository, transfer repository, and MyToken repository.
-//
-// Parameters:
-// - approvalRepo: The approval repository for the ContractWriterService.
-// - transferRepo: The transfer repository for the ContractWriterService.
-// - myTokenRepo: The MyToken repository for the ContractWriterService.
-// Return type: *ContractWriterService.
 func NewContractWriterService(
 	approvalRepo repositories.ApprovalRepository,
 	transferRepo repositories.TransferRepository,
@@ -51,12 +40,6 @@ func NewContractWriterService(
 }
 
 // Subscribe handles subscribing to different topics and delegates the handling based on the topic type.
-//
-// - ctx: The context for the subscription.
-// - topic: The topic string to determine the handling.
-// - msg: The message containing the subscription details.
-// - tt: The timestamp for the subscription event.
-// Return type: None.
 func (s *ContractWriterService) Subscribe(ctx context.Context, topic string, msg *pubsub.Pack, tt time.Time) {
 	switch topic {
 	case pb.TopicEvent_TOPIC_EVENT_APPROVAL.String():
@@ -71,12 +54,6 @@ func (s *ContractWriterService) Subscribe(ctx context.Context, topic string, msg
 }
 
 // handleApprovalEvent handles the approval event by unmarshaling the message and creating an approval record.
-//
-// Parameters:
-// - ctx: The context for the approval event.
-// - msg: The message containing the approval details.
-// - tt: The timestamp for the approval event.
-// Return type: None.
 func (s *ContractWriterService) handleApprovalEvent(ctx context.Context, msg *pubsub.Pack, tt time.Time) {
 	var approval pb.Approval
 	if err := proto.Unmarshal(msg.Msg, &approval); err != nil {
@@ -95,12 +72,6 @@ func (s *ContractWriterService) handleApprovalEvent(ctx context.Context, msg *pu
 }
 
 // handleTransferEvent handles the transfer event by unmarshaling the message and creating a transfer record.
-//
-// Parameters:
-// - ctx: The context for the transfer event.
-// - msg: The message containing the transfer details.
-// - tt: The timestamp for the transfer event.
-// Return type: None.
 func (s *ContractWriterService) handleTransferEvent(ctx context.Context, msg *pubsub.Pack, tt time.Time) {
 	var transfer pb.Transfer
 	if err := proto.Unmarshal(msg.Msg, &transfer); err != nil {
@@ -120,11 +91,6 @@ func (s *ContractWriterService) handleTransferEvent(ctx context.Context, msg *pu
 }
 
 // handleSendMyTokenTransactionEvent handles the sending of a transaction event.
-//
-// Parameters:
-// - ctx: The context for the transaction.
-// - msg: The message containing the transaction details.
-// Return type: None.
 func (s *ContractWriterService) handleSendMyTokenTransactionEvent(ctx context.Context, msg *pubsub.Pack, _ time.Time) {
 	var tx pb.Transaction
 	if err := proto.Unmarshal(msg.Msg, &tx); err != nil {
@@ -144,12 +110,6 @@ func (s *ContractWriterService) handleSendMyTokenTransactionEvent(ctx context.Co
 }
 
 // handleSendNativeTokenTransactionEvent handles the sending of a native token transaction event.
-//
-// Parameters:
-// - ctx: The context for the transaction.
-// - msg: The message containing the transaction details.
-// - _: The timestamp for the transaction event (unused).
-// Return type: None.
 func (s *ContractWriterService) handleSendNativeTokenTransactionEvent(ctx context.Context, msg *pubsub.Pack, _ time.Time) {
 	var tx pb.Transaction
 	if err := proto.Unmarshal(msg.Msg, &tx); err != nil {

@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"log"
 	"net/http"
 	"strings"
 
@@ -19,26 +18,15 @@ import (
 type middlewareFunc func(http.Handler) http.Handler
 
 var (
+	// Authorization is the name of the authorization header
 	Authorization = "Authorization"
-	Bearer        = "Bearer"
-	InfoKey       = "info_key"
-	CookieKey     = "h5token"
+	// Bearer is the name of the bearer token
+	Bearer = "Bearer"
 
 	ignoredAPIs         []string
 	invalidateCacheAPIs []string
 	ignoredForLogAPIs   []string
 )
-
-func init() {
-
-	ignoredAPIs = []string{}
-
-	ignoredForLogAPIs = []string{}
-
-	invalidateCacheAPIs = append(
-		invalidateCacheAPIs,
-	)
-}
 
 type payloadKeys struct{}
 
@@ -56,6 +44,9 @@ func GetClientIP(req *http.Request) string {
 	return clientIP[0]
 }
 
+// allowCORS sets up CORS headers for the HTTP handler.
+//
+// It takes an http.Handler as a parameter and returns an http.Handler.
 func allowCORS(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -67,20 +58,20 @@ func allowCORS(h http.Handler) http.Handler {
 	})
 }
 
-type mapMetaDataFunc func(context.Context, *http.Request) metadata.MD
+// MapMetaDataFunc defines a function that extracts metadata from the request
+type MapMetaDataFunc func(context.Context, *http.Request) metadata.MD
 
-// MapMetaDataWithBearerToken ...
-func MapMetaDataWithBearerToken() mapMetaDataFunc {
+// MapMetaDataWithBearerToken defines a function that extracts authorization information from the request header
+// and creates metadata based on the bearer token found in the authorization header.
+func MapMetaDataWithBearerToken() MapMetaDataFunc {
 	return func(ctx context.Context, r *http.Request) metadata.MD {
 		md := metadata.MD{}
 		authorization := r.Header.Get(Authorization)
-		log.Println("authorization", authorization)
 		if authorization != "" {
 			schema, bearerToken, ok := strings.Cut(authorization, " ")
 			if !ok || strings.ToLower(schema) != strings.ToLower(Bearer) {
 				return md
 			}
-			log.Println("zzzz")
 			payload, err := util.VerifyToken(bearerToken)
 			if err == nil {
 				md = metadata.Join(md, mtdt.ImportUserInfoToCtx(&mtdt.Payload{
@@ -120,6 +111,7 @@ func MapMetaDataWithBearerToken() mapMetaDataFunc {
 // 	}
 // }
 
+// Response is the response struct for the http server
 type Response struct {
 	Code    int      `json:"code"`
 	Message string   `json:"message"`
@@ -127,6 +119,7 @@ type Response struct {
 	Data    any      `json:"data"`
 }
 
+// ErrorResponse generates an error response with the provided code and error message.
 func ErrorResponse(w http.ResponseWriter, code int, err error) {
 	resp := &Response{
 		Code:    code,
@@ -141,6 +134,7 @@ func ErrorResponse(w http.ResponseWriter, code int, err error) {
 	w.Write(jData)
 }
 
+// DataResponse generates a data response with the provided data and writes it to the http.ResponseWriter.
 func DataResponse(w http.ResponseWriter, data any) {
 	resp := &Response{
 		Data: data,
@@ -153,6 +147,7 @@ func DataResponse(w http.ResponseWriter, data any) {
 	w.Write(jData)
 }
 
+// forwardErrorResponse forwards an error response to the client based on the provided error.
 func forwardErrorResponse(ctx context.Context, s *runtime.ServeMux, m runtime.Marshaler, w http.ResponseWriter, r *http.Request, err error) {
 	sta := status.Convert(err)
 	errStr := sta.Message()
@@ -170,10 +165,16 @@ type responseWriterWrapper struct {
 	statusCode int
 }
 
+// NewWrapResponseWriter creates a new wrapped response writer based on the provided http.ResponseWriter.
+//
+// It takes an http.ResponseWriter as a parameter and returns a pointer to a responseWriterWrapper.
 func NewWrapResponseWriter(w http.ResponseWriter) *responseWriterWrapper {
 	return &responseWriterWrapper{w, http.StatusOK}
 }
 
+// WriteHeader sets the status code for the response writer.
+//
+// It takes an integer code as a parameter.
 func (w *responseWriterWrapper) WriteHeader(code int) {
 	w.statusCode = code
 	w.ResponseWriter.WriteHeader(code)

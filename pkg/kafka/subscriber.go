@@ -49,17 +49,11 @@ func NewSubscriber(
 }
 
 // Stop stops the subscriber.
-//
-// ctx context.Context
-// error
-func (g *subscriber) Stop(ctx context.Context) error {
+func (g *subscriber) Stop(_ context.Context) error {
 	return g.client.Close()
 }
 
 // Start starts the subscriber with the provided context.
-//
-// ctx: Context to control the execution flow.
-// error: An error if the function encounters any issues.
 func (g *subscriber) Start(ctx context.Context) error {
 	log.Println(g.groupID)
 	consumer := consumerGroupHandler{

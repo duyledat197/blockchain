@@ -16,12 +16,15 @@ type Server struct {
 	deployContract *services.DeployContractService
 }
 
+// NewServer creates a new server instance.
 func NewServer() *Server {
 	return &Server{
 		service: *processor.NewService(),
 	}
 }
-func (s *Server) loadEthClient(ctx context.Context) {
+
+// loadEthClient initializes the Ethereum client for the server.
+func (s *Server) loadEthClient(_ context.Context) {
 	cfg := s.service.Cfg
 
 	s.ethClient = eth_client.NewDialClient(cfg.ETHClient.Address())
@@ -29,13 +32,15 @@ func (s *Server) loadEthClient(ctx context.Context) {
 	s.service.WithFactories(s.ethClient)
 }
 
-func (s *Server) loadServices(ctx context.Context) {
+// loadServices initializes the services in the server with the provided Ethereum client and private key.
+func (s *Server) loadServices(_ context.Context) {
 	cfg := s.service.Cfg
 	s.deployContract = services.NewDeployContractService(s.ethClient, cfg.PrivateKey)
 
 	s.service.WithProcessors(s.deployContract)
 }
 
+// Run runs the server with the provided context.
 func (s *Server) Run(ctx context.Context) {
 	s.service.LoadLogger()
 	s.service.LoadConfig()

@@ -31,9 +31,6 @@ type authService struct {
 }
 
 // NewAuthService creates a new AuthService instance with the provided user repository.
-//
-// userRepo: the user repository for the AuthService.
-// Returns an AuthServiceServer.
 func NewAuthService(userRepo repositories.UserRepository, publisher pubsub.Publisher, privateKey string) pb.AuthServiceServer {
 	return &authService{
 		userRepo:   userRepo,
@@ -43,10 +40,6 @@ func NewAuthService(userRepo repositories.UserRepository, publisher pubsub.Publi
 }
 
 // Login handles the authentication of a user.
-//
-// ctx: the context for the authentication.
-// req: the login request containing user credentials.
-// Returns a LoginResponse and an error.
 func (s *authService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
 	user, err := s.userRepo.FindUserByUsername(ctx, req.GetUsername())
 	if err != nil {
@@ -76,10 +69,6 @@ func (s *authService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.Logi
 }
 
 // Register handles the registration of a new user.
-//
-// ctx: the context for the registration.
-// req: the registration request containing user information.
-// Returns a RegisterResponse and an error.
 func (s *authService) Register(ctx context.Context, req *pb.RegisterRequest) (*pb.RegisterResponse, error) {
 	pwd, err := util.HashPassword(req.GetPassword())
 	if err != nil {

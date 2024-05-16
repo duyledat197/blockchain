@@ -23,26 +23,9 @@ const (
 	MDXForwardedFor = "x-forwarded-for"
 )
 
-func ImportIpToCtx(ip string) metadata.MD {
-	md := metadata.Pairs(MDIpKey, ip)
-
-	return md
-}
-
-func ExtractIpFromCtx(ctx context.Context) (*Payload, bool) {
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return nil, false
-	}
-	values := md.Get(MDIpKey)
-	if len(values) < 1 {
-		return nil, false
-	}
-	return &Payload{
-		Ip: values[0],
-	}, true
-}
-
+// ImportUserInfoToCtx creates metadata containing user information from the provided payload.
+//
+// It takes a payload struct as input and returns metadata.MD.
 func ImportUserInfoToCtx(payload *Payload) metadata.MD {
 	md := metadata.Pairs(MDUserIDKey, payload.UserID)
 	md.Append(MDUserNameKey, payload.UserName)
@@ -53,6 +36,7 @@ func ImportUserInfoToCtx(payload *Payload) metadata.MD {
 	return md
 }
 
+// ExtractUserInfoFromCtx extracts user information from the context.
 func ExtractUserInfoFromCtx(ctx context.Context) (*Payload, bool) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
@@ -84,7 +68,11 @@ func ExtractUserInfoFromCtx(ctx context.Context) (*Payload, bool) {
 	}, true
 }
 
+// InjectIncomingCtxToOutgoingCtx injects metadata from incoming context to outgoing context.
+//
+// It takes a context.Context parameter and returns a context.Context.
 func InjectIncomingCtxToOutgoingCtx(ctx context.Context) context.Context {
 	md, _ := metadata.FromIncomingContext(ctx)
+
 	return metadata.NewOutgoingContext(ctx, md)
 }

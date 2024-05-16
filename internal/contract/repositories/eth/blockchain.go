@@ -61,14 +61,7 @@ func (r *BlockchainRepo) RetrieveBalanceOf(ctx context.Context, address common.A
 }
 
 // SendTransaction sends a signed transaction to the blockchain network.
-//
-// Parameters:
-// - ctx: The context.Context object for cancellation and timeouts.
-// - privateKey: The private key used for signing the transaction.
-// - fromAddress: The address from which the transaction is sent.
-// - toAddress: The address to which the transaction is sent.
-// - value: The amount of cryptocurrency to send in the transaction.
-// Return type: error, indicating any error that occurred during the transaction.
+// It return an error indicating any error that occurred during the transaction.
 func (r *BlockchainRepo) SendTransaction(ctx context.Context, privateKey *ecdsa.PrivateKey, fromAddress, toAddress common.Address, value *big.Int) error {
 	if err := retry(3, 1*time.Second, func() error {
 		nonce, err := r.client.PendingNonceAt(ctx, fromAddress)
@@ -106,11 +99,6 @@ func (r *BlockchainRepo) SendTransaction(ctx context.Context, privateKey *ecdsa.
 }
 
 // retry retries the given function up to a specified number of attempts with increasing sleep durations between retries.
-//
-// - attempts: The number of retry attempts.
-// - sleep: The duration to sleep between retry attempts.
-// - f: The function to retry.
-// Return type: error.
 func retry(attempts int, sleep time.Duration, f func() error) (err error) {
 	for i := 0; i < attempts; i++ {
 		if i > 0 {

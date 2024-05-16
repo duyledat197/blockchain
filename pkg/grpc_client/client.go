@@ -14,18 +14,12 @@ import (
 )
 
 // GrpcClient represents a gRPC client connection.
-//
-// *grpc.ClientConn: the gRPC client connection.
-// cfg: the configuration for the endpoint.
 type GrpcClient struct {
 	*grpc.ClientConn                  // The gRPC client connection.
 	cfg              *config.Endpoint // The configuration for the endpoint.
 }
 
 // NewGrpcClient creates a new GrpcClient with the given config endpoint.
-//
-// cfg: the config endpoint for the GrpcClient.
-// *GrpcClient: returns a pointer to the newly created GrpcClient.
 func NewGrpcClient(cfg *config.Endpoint) *GrpcClient {
 	return &GrpcClient{
 		cfg: cfg,
@@ -33,10 +27,7 @@ func NewGrpcClient(cfg *config.Endpoint) *GrpcClient {
 }
 
 // Connect establishes a connection to the gRPC server.
-//
-// ctx: the context to use for the connection.
-// error: returns an error if the connection fails.
-func (c *GrpcClient) Connect(ctx context.Context) error {
+func (c *GrpcClient) Connect(_ context.Context) error {
 	optsRetry := []grpc_retry.CallOption{
 		grpc_retry.WithBackoff(grpc_retry.BackoffExponential(50 * time.Millisecond)),
 		grpc_retry.WithPerRetryTimeout(3 * time.Second),
@@ -67,6 +58,6 @@ func (c *GrpcClient) Connect(ctx context.Context) error {
 // Close closes the gRPC client connection.
 //
 // It takes a context.Context as a parameter and returns an error if there was a problem closing the connection.
-func (c *GrpcClient) Close(ctx context.Context) error {
+func (c *GrpcClient) Close(_ context.Context) error {
 	return c.ClientConn.Close()
 }

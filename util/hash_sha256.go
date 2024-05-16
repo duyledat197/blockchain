@@ -6,9 +6,6 @@ import (
 )
 
 // HashSHA256 calculates the SHA256 hash of the concatenated input data slices.
-//
-// data: Input byte slices to be hashed.
-// []byte: The SHA256 hash of the input data.
 func HashSHA256(data ...[]byte) []byte {
 	headers := bytes.Join(data, []byte{})
 	hash := sha256.Sum256(headers)

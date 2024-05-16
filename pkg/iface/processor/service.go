@@ -22,9 +22,6 @@ type Service struct {
 }
 
 // NewService initializes and returns a new Service instance.
-//
-// No parameters.
-// Returns a pointer to a Service.
 func NewService() *Service {
 	return &Service{
 		processors: make([]Processor, 0),
@@ -33,17 +30,11 @@ func NewService() *Service {
 }
 
 // LoadConfig loads the configuration for the Service.
-//
-// No parameters.
-// No return value.
 func (s *Service) LoadConfig() {
 	s.Cfg = config.LoadConfig()
 }
 
 // LoadLogger loads the logger based on the environment.
-//
-// No parameters.
-// No return.
 func (s *Service) LoadLogger() {
 	var slogHandler slog.Handler
 	switch os.Getenv("ENV") {

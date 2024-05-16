@@ -1,12 +1,11 @@
 # Prerequisites
 Before you start, make sure that you have the following software installed on your computer:
 
-* Go programming language (version 1.22 or later)
-* Git version control system
-* Docker version 25.0.2 or later
-* Make 3.81 or later
+* [Go programming language](https://go.dev/dl/) (version `1.22` or later)
+* [Docker](https://www.docker.com/) version `25.0.2` or later
+* [Make](https://www.gnu.org/software/make/manual/make.html) `3.81` or later
 
-# Tasks
+# Workloads
 ## Blockchain Consensus Algorithm
 Using this command for interact with blockchain algorithm. 
 
@@ -15,138 +14,179 @@ Using this command for interact with blockchain algorithm.
 ```
 
 ## Blockchain Interaction
-Using this command for start all service that serve for web application. It is also include Blockchain interaction.
+To start all services required for your web application, including those that handle blockchain interactions, run the following command:
 
 ```sh
-  make start-all # start all services that serve for blockchain interact with algorithm
+  make start-all 
 ```
+
 ## Smart Contract Deployment
-Using this command for deploy contract (deploy **MyToken** contract).
+1. First, retrieve an account's private key by running the following command:
+```sh
+  make get-accounts
+```
+This command will output one or more private keys. Note the key you intend to use for deployment.
+
+2. You will need to remove the first two characters (**0x**) from the hexadecimal representation of the private key. Here’s an example:
+```sh
+# Before: 0x822394ad1caf8ec4bf4e9406a6952f62ec6b787d2086b9c45c8b2f0e44ba5dfc
+# After: 822394ad1caf8ec4bf4e9406a6952f62ec6b787d2086b9c45c8b2f0e44ba5dfc
+```
+3. Replace the private_key field in `./config/common/config.yaml` with the formatted private key from the previous step. Your config.yaml should look something like this:
+```sh
+# ./config/common/config.yaml
+blockchain:
+  private_key: "822394ad1caf8ec4bf4e9406a6952f62ec6b787d2086b9c45c8b2f0e44ba5dfc"
+  # other configuration settings
+
+```
+
+4. To deploy the **MyToken** smart contract, use the following command:
+This command will compile and deploy the MyToken contract to ganache network.
 
 ```sh
   make deploy-contract # deploy contract
 ```
+
 ## Web Application Development
 After you start all services, the frontend UI already serve in http://localhost:9999 by default.
 
 ## Security Considerations:
-
-- [x] Transfer using signature instead of sending private key through http/https.
-- [] Improve web application protocol using SSL (https).
-- [] Improve using SSL for grpc protocol for each servers.
-- [] Split private key of user into more part and store each part in more place.
+- [] Implement multi-factor authentication (MFA) for accessing the server and its APIs.
+- [] [RBAC](https://en.wikipedia.org/wiki/Role-based_access_control): Define and enforce roles and permissions to ensure users only have access to the functionalities they need.
+- [] Use HTTPS to encrypt data in transit between clients and the server.
+- [] Implement rate limiting to protect against DDoS attacks and abuse of API endpoints.
+- [] Implement real-time monitoring and alerting to detect and respond to suspicious activities promptly (using `prometheus`).
+- [] Secure private keys using hardware security modules (HSMs) or secure enclaves. Never hardcode private keys in the source code.
+- [] Configure firewalls to limit access to the server and protect against unauthorized access.
+- [] Perform regular backups of critical data and configuration files.
+- [] Integration tests aim to verify that different components of a system can work together correctly as a whole
 
 ## Optimization and Scalability
-
-- [x] Split contract service(responsible for contract implementation) into 2 service(contract_reader, contract_writer).
-- [x] Implement new watcher service that subscribe to websocket of ethereum chain and publish message to message queue.
-- [] Improve send transaction handler with multi-instance can serve. 
-- [] Improve to multi watcher (currently, only one watcher subscribe to event logs).
+- [] Implement caching strategies (e.g., Redis, Memcached) to store frequently accessed data and reduce database load.
+- [] **Horizontal Scaling** Add more instances of (**gateway**, **user**, **contract_reader**, **contract_writer** services) to distribute the load (ex: Kubernetes).
+- [] **Vertical Scaling**: Increase the resources (CPU, memory) of **watcher service** to handle more load.
 
 ## Documentation
 
 ### Architecture
 
-![image](./docs//wiki/blockchain_architechture.png)
+![image](./docs/wiki/blockchain_architechture.png)
 
-#### Description ✍️: 
-⭐ **Gateway service**: Responsible to deliver all apis to services using reverse proxy. \
-⭐ **User management service**: Responsible to auth/user management. \
-⭐ **Contract writer service**: Responsible to write command for contract or ethereum chain information. \
-⭐ **Contract reader service**: Responsible to read command for contract or ethereum chain information. \
-⭐ **Watcher service**: Responsible to watch event logs from ethereum chain.
+## Services Overview
+
+### ⭐ Gateway Service
+The Gateway Service acts as a reverse proxy, routing client requests to the appropriate backend services. It consolidates all API calls, ensuring secure and efficient communication between the client and the microservices.
+
+### ⭐ User Management Service
+The User Management Service handles user authentication and authorization. It manages user data, registration, login, and access control, ensuring secure user interactions across the platform.
+
+### ⭐ Contract Writer Service
+The Contract Writer Service is responsible for sending commands to the Ethereum blockchain. It facilitates the creation, deployment, and updating of smart contracts, ensuring that all write operations are executed correctly on the blockchain.
+
+### ⭐ Contract Reader Service
+The Contract Reader Service retrieves data from the Ethereum blockchain. It reads smart contract states, transaction details, and other blockchain information, providing accurate and up-to-date data to other services.
+
+### ⭐ Watcher Service
+The Watcher Service monitors event logs from the Ethereum blockchain. It listens for specific events, triggers notifications or actions in response to these events, and ensures that the system reacts promptly to changes on the blockchain.
+
+### Some Important flows
+Deploy Flow
+![image](./docs/wiki/deploy_flow.png)
+Send Transaction Flow
+![image](./docs/wiki/send_transaction_flow.png)
 
 ### Structure folder:
 ```
 .
-├── LICENSE
-├── Makefile
-├── README.md
-├── api
-│   ├── protos
+├── LICENSE                     # License file for the project
+├── Makefile                    # Makefile for automating tasks and commands
+├── README.md                   # Project's README file with overview and instructions
+├── api                         # Directory for API definitions and smart contract sources
+│   ├── protos                  # Protocol buffer definitions
 │   │   ├── common
-│   │   │   └── common.proto
+│   │   │   └── common.proto    # Common protobuf definitions shared across services
 │   │   ├── contract
-│   │   │   └── contract_reader.proto
+│   │   │   └── contract_reader.proto # Protobuf for contract reader service
 │   │   └── user
-│   │       ├── auth.proto
-│   │       └── user.proto
-│   └── sols
-│       ├── ERC20.sol
-│       ├── IERC20.sol
-│       └── MyToken.sol
-├── cmd
-│   ├── contractReader.go
-│   ├── contractWriter.go
-│   ├── deployContract.go
-│   ├── frontend.go
-│   ├── gateway.go
-│   ├── root.go
-│   ├── srv
+│   │       ├── auth.proto      # Protobuf for authentication service
+│   │       └── user.proto      # Protobuf for user management service
+│   └── sols                    # Solidity smart contract sources
+│       ├── ERC20.sol           # ERC20 token contract source
+│       ├── IERC20.sol          # ERC20 interface source
+│       └── MyToken.sol         # Custom token contract source
+├── cmd                         # Main entry points for different services
+│   ├── contractReader.go       # Entry point for the contract reader service
+│   ├── contractWriter.go       # Entry point for the contract writer service
+│   ├── deployContract.go       # Entry point for the contract deployment service
+│   ├── frontend.go             # Entry point for the frontend service
+│   ├── gateway.go              # Entry point for the gateway service
+│   ├── root.go                 # Root command definition
+│   ├── srv                     # Service-specific main files
 │   │   ├── contract_reader
-│   │   │   └── srv.go
+│   │   │   └── srv.go          # Main file for the contract reader service
 │   │   ├── contract_writer
-│   │   │   └── srv.go
+│   │   │   └── srv.go          # Main file for the contract writer service
 │   │   ├── deploy_contract
-│   │   │   └── srv.go
+│   │   │   └── srv.go          # Main file for the deploy contract service
 │   │   ├── frontend
-│   │   │   └── srv.go
+│   │   │   └── srv.go          # Main file for the frontend service
 │   │   ├── gateway
-│   │   │   └── srv.go
+│   │   │   └── srv.go          # Main file for the gateway service
 │   │   ├── user
-│   │   │   └── srv.go
+│   │   │   └── srv.go          # Main file for the user management service
 │   │   └── watcher
-│   │       └── srv.go
-│   ├── user.go
-│   └── watcher.go
-├── config
-│   ├── address.go
+│   │       └── srv.go          # Main file for the watcher service
+│   ├── user.go                 # Entry point for the user management service
+│   └── watcher.go              # Entry point for the watcher service
+├── config                      # Configuration files for different services
+│   ├── address.go              # Common address configuration
 │   ├── common
-│   │   └── config.yaml
-│   ├── config.go
+│   │   └── config.yaml         # Common configuration file
+│   ├── config.go               # Configuration setup
 │   ├── contract_reader
-│   │   └── config.yaml
+│   │   └── config.yaml         # Configuration for contract reader service
 │   ├── contract_writer
-│   │   └── config.yaml
-│   ├── database.go
+│   │   └── config.yaml         # Configuration for contract writer service
+│   ├── database.go             # Database configuration
 │   ├── deploy_contract
-│   │   └── config.yaml
+│   │   └── config.yaml         # Configuration for deploy contract service
 │   ├── frontend
-│   │   └── config.yaml
+│   │   └── config.yaml         # Configuration for frontend service
 │   ├── gateway
-│   │   └── config.yaml
+│   │   └── config.yaml         # Configuration for gateway service
 │   ├── user
-│   │   └── config.yaml
+│   │   └── config.yaml         # Configuration for user management service
 │   └── watcher
-│       └── config.yaml
-├── developments
-│   ├── Dockerfile
-│   ├── docker-compose.all.yml
-│   ├── docker-compose.gen.yml
-│   ├── docker-compose.yml
-│   ├── ganache_data
-│   ├── gen-proto.sh
-│   ├── gen-sol.sh
-│   ├── proto.Dockerfile
-│   └── sol.Dockerfile
-├── docs
-│   ├── swagger
+│       └── config.yaml         # Configuration for watcher service
+├── developments                # Development environment setup files
+│   ├── Dockerfile              # Dockerfile for building the development environment
+│   ├── docker-compose.all.yml  # Docker Compose file to start all services
+│   ├── docker-compose.gen.yml  # Docker Compose file for generating files
+│   ├── docker-compose.yml      # Docker Compose file for standard setup
+│   ├── ganache_data            # Directory for Ganache blockchain data
+│   ├── gen-proto.sh            # Script to generate protobuf files
+│   ├── gen-sol.sh              # Script to generate Solidity files
+│   ├── proto.Dockerfile        # Dockerfile for protobuf generation
+│   └── sol.Dockerfile          # Dockerfile for Solidity contract generation
+├── docs                        # Documentation files
+│   ├── swagger                 # Swagger API documentation
 │   │   ├── blockchain
-│   │   │   └── blockchain.swagger.json
+│   │   │   └── blockchain.swagger.json # Swagger doc for blockchain APIs
 │   │   ├── common
-│   │   │   └── common.swagger.json
+│   │   │   └── common.swagger.json     # Swagger doc for common APIs
 │   │   ├── contract
-│   │   │   └── contract_reader.swagger.json
+│   │   │   └── contract_reader.swagger.json # Swagger doc for contract reader API
 │   │   └── user
-│   │       ├── auth.swagger.json
-│   │       └── user.swagger.json
+│   │       ├── auth.swagger.json       # Swagger doc for auth API
+│   │       └── user.swagger.json       # Swagger doc for user
 │   └── wiki
-│       └── blockchain_architechture.png
-├── go.mod
-├── go.sum
-├── html # presentation for UI.
-├── idl
-│   ├── contracts
+│       └── blockchain_architechture.png # Diagram of blockchain architecture
+├── go.mod                      # Go module file
+├── go.sum                      # Go module dependencies file
+├── html                        # Directory for UI presentation files
+├── idl                         # Interface Definition Language files
+│   ├── contracts               # ABI and binary files for contracts
 │   │   ├── ERC20.abi
 │   │   ├── ERC20.bin
 │   │   ├── ERC20.go
@@ -156,7 +196,7 @@ After you start all services, the frontend UI already serve in http://localhost:
 │   │   ├── MyToken.abi
 │   │   ├── MyToken.bin
 │   │   └── MyToken.go
-│   └── pb
+│   └── pb                      # Generated protobuf Go files
 │       ├── common
 │       │   ├── common.pb.go
 │       │   └── common.pb.validate.go
@@ -174,10 +214,10 @@ After you start all services, the frontend UI already serve in http://localhost:
 │           ├── user.pb.gw.go
 │           ├── user.pb.validate.go
 │           └── user_grpc.pb.go
-├── internal
+├── internal                    # Internal package for core business logic
 │   ├── blockchain
 │   │   └── watcher
-│   │       └── watcher.go
+│   │       └── watcher.go      # Blockchain watcher implementation
 │   ├── contract
 │   │   ├── entities
 │   │   │   ├── approval.go
@@ -208,72 +248,73 @@ After you start all services, the frontend UI already serve in http://localhost:
 │           ├── auth.go
 │           ├── auth_test.go
 │           └── user.go
-├── main.go
-├── pkg
-│   ├── blockchain
+├── main.go                     # Main entry point for the application
+├── pkg                         # Package directory for reusable components
+│   ├── blockchain              # Blockchain-related utilities and components
 │   │   ├── block
-│   │   │   └── block.go
-│   │   ├── blockchain.go
+│   │   │   └── block.go        # Implementation of blockchain blocks
+│   │   ├── blockchain.go       # Core blockchain logic
 │   │   ├── miner
-│   │   │   └── miner.go
+│   │   │   └── miner.go        # Miner implementation
 │   │   └── pow
-│   │       ├── pow.go
-│   │       └── pow_test.go
-│   ├── constants
-│   │   └── constants.go
-│   ├── eth_client
-│   │   ├── client.go
-│   │   ├── dial_client.go
-│   │   └── simulated_client.go
-│   ├── grpc_client
-│   │   └── client.go
-│   ├── grpc_server
-│   │   ├── grpc.go
-│   │   └── health_check.go
-│   ├── http_server
-│   │   ├── http.go
-│   │   ├── middleware.go
-│   │   └── utils.go
-│   ├── iface
+│   │       ├── pow.go          # Proof-of-work algorithm implementation
+│   │       └── pow_test.go     # Tests for proof-of-work implementation
+│   ├── constants               # Common constants used across
+│   │   └── constants.go        # Definition of constants
+│   ├── eth_client              # Ethereum client implementations
+│   │   ├── client.go           # Base Ethereum client
+│   │   ├── dial_client.go      # Ethereum client that dials a real node
+│   │   └── simulated_client.go # Ethereum client for simulated blockchain environments
+│   ├── grpc_client             # gRPC client implementations
+│   │   └── client.go           # Base gRPC client
+│   ├── grpc_server             # gRPC server implementations
+│   │   ├── grpc.go             # Base gRPC server setup
+│   │   └── health_check.go     # Health check implementation for gRPC server
+│   ├── http_server             # HTTP server implementations
+│   │   ├── http.go             # Base HTTP server setup
+│   │   ├── middleware.go       # Middleware components for HTTP server
+│   │   └── utils.go            # Utility functions for HTTP server
+│   ├── iface                   # Interface definitions for various components
 │   │   ├── processor
-│   │   │   ├── processor.go
-│   │   │   └── service.go
-│   │   └── pubsub
-│   │       ├── model.go
-│   │       ├── publisher.go
-│   │       └── subscriber.go
-│   ├── kafka
-│   │   ├── handler.go
-│   │   ├── publisher.go
-│   │   └── subscriber.go
-│   ├── metadata
-│   │   └── metadata.go
-│   ├── mongo_client
-│   │   └── client.go
-│   └── xerror
-│       └── xerror.go
-├── tests
+│   │   │   ├── processor.go    # Processor interface definition
+│   │   │   └── service.go      # Service interface definition
+│   │   └── pubsub              # Publish-subscribe interface definitions
+│   │       ├── model.go        # Models for pub-sub
+│   │       ├── publisher.go    # Publisher interface
+│   │       └── subscriber.go   # Subscriber interface
+│   ├── kafka                   # Kafka publisher and subscriber implementations
+│   │   ├── handler.go          # Kafka message handler
+│   │   ├── publisher.go        # Kafka publisher implementation
+│   │   └── subscriber.go       # Kafka subscriber implementation
+│   ├── metadata                # Metadata utilities
+│   │   └── metadata.go         # Metadata handling functions
+│   ├── mongo_client            # MongoDB client implementation
+│   │   └── client.go           # Base MongoDB client setup
+   └── xerror                  # Extended error handling utilities
+│       └── xerror.go           # Custom error types and handling functions
+├── tests                       # Testing suite for various components
 │   ├── blockchain
-│   │   └── main.go
+│   │   └── main.go             # Main test suite for blockchain components
 │   ├── kafka
 │   │   ├── publisher
-│   │   │   └── main.go
+│   │   │   └── main.go         # Test suite for Kafka publisher
 │   │   └── subscriber
-│   │       └── main.go
+│   │       └── main.go         # Test suite for Kafka subscriber
 │   ├── layer1
 │   │   └── ganache
-│   │       └── main.go
+│   │       └── main.go         # Test suite for Layer 1 blockchain using Ganache
 │   └── mongo
-│       └── main.go
-└── util
-    ├── convert.go
-    ├── crypto.go
-    ├── eth_util
-    │   ├── util.go
-    │   └── util_test.go
-    ├── hash_sha256.go
-    ├── jwt.go
-    └── password.go
+│       └── main.go             # Test suite for MongoDB integration
+└── util                        # Utility functions
+    ├── convert.go              # Data conversion utilities
+    ├── crypto.go               # Cryptographic utilities
+    ├── eth_util                # Ethereum-specific utilities
+    │   ├── util.go             # General Ethereum utilities
+    │   └── util_test.go        # Tests for Ethereum utilities
+    ├── hash_sha256.go          # SHA-256 hashing utility
+    ├── jwt.go                  # JSON Web Token (JWT) utilities
+    └── password.go             # Password hashing and validation utilities
+
 
 89 directories, 180 files
 ```

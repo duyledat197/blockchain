@@ -19,25 +19,11 @@ func (b *Block) SetHash(hash []byte) {
 }
 
 // SetNonce sets the nonce value of the Block object.
-//
-// Parameters:
-// - nonce: The nonce value to be set.
-//
-// Returns:
-// This function does not return anything.
 func (b *Block) SetNonce(nonce int64) {
 	b.Nonce = nonce
 }
 
 // NewBlock creates a new Block object with the given index, data, and previous block hash.
-//
-// Parameters:
-// - index: The index of the block.
-// - data: The data of the block.
-// - prevBlockHash: The hash of the previous block.
-//
-// Returns:
-// - A pointer to the newly created Block object.
 func NewBlock(index uint64, data, prevBlockHash []byte) *Block {
 	block := &Block{
 		Index:         index,
@@ -50,9 +36,6 @@ func NewBlock(index uint64, data, prevBlockHash []byte) *Block {
 }
 
 // NewGenesisBlock creates a new genesis block with the given index, data, and previous block hash.
-//
-// Returns:
-// - A pointer to the newly created Block object.
 func NewGenesisBlock() *Block {
 	return NewBlock(1, []byte("Genesis Block"), []byte{})
 }

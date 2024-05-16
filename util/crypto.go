@@ -10,9 +10,6 @@ import (
 )
 
 // NewPrivateKey generates a new private key.
-//
-// No parameters.
-// Returns *ecdsa.PrivateKey, string, error.
 func NewPrivateKey() (*ecdsa.PrivateKey, string, error) {
 	privateKey, err := crypto.GenerateKey()
 	if err != nil {
@@ -25,9 +22,6 @@ func NewPrivateKey() (*ecdsa.PrivateKey, string, error) {
 }
 
 // PubKeyFromPrivKey generates a public key from a given private key.
-//
-// privateKey: The private key from which to generate the public key.
-// Returns a string representing the public key and a pointer to the ecdsa.PublicKey.
 func PubKeyFromPrivKey(privateKey *ecdsa.PrivateKey) (string, *ecdsa.PublicKey) {
 	publicKey := privateKey.Public()
 	publicKeyECDSA, _ := publicKey.(*ecdsa.PublicKey)

@@ -37,12 +37,14 @@ type Server struct {
 	service *processor.Service
 }
 
+// NewServer creates a new server instance with a new service.
 func NewServer() *Server {
 	return &Server{
 		service: processor.NewService(),
 	}
 }
 
+// loadClients initializes the user client and factories for the server.
 func (s *Server) loadClients() {
 	userConn := grpc_client.NewGrpcClient(s.service.Cfg.UserService)
 
@@ -52,12 +54,14 @@ func (s *Server) loadClients() {
 
 }
 
+// loadDatabases initializes the MongoDB client for the server.
 func (s *Server) loadDatabases() {
 	s.mongoClient = mongoclient.NewMongoClient(s.service.Cfg.MongoDB.Address())
 
 	s.service.WithFactories(s.mongoClient)
 }
 
+// loadPublisher initializes a publisher for the server.
 func (s *Server) loadPublisher() {
 	clientID := uuid.NewString()
 	s.publisher = kafka.NewPublisher(clientID, s.service.Cfg.Kafka.Address())
@@ -65,6 +69,7 @@ func (s *Server) loadPublisher() {
 	s.service.WithFactories(s.publisher)
 }
 
+// loadEthClient initializes the Ethereum client for the server.
 func (s *Server) loadEthClient(ctx context.Context) {
 	cfg := s.service.Cfg
 
@@ -73,6 +78,7 @@ func (s *Server) loadEthClient(ctx context.Context) {
 	s.service.WithFactories(s.ethClient)
 }
 
+// loadRepositories initializes the necessary repositories for the server.
 func (s *Server) loadRepositories() {
 	s.approvalRepo = mongo.NewApprovalRepository(s.mongoClient, s.service.Cfg.MongoDB.Database)
 	s.transferRepo = mongo.NewTransferRepository(s.mongoClient, s.service.Cfg.MongoDB.Database)
@@ -81,17 +87,11 @@ func (s *Server) loadRepositories() {
 }
 
 // loadServices initializes the contract reader service with the necessary repositories and publisher.
-//
-// No parameters.
-// No return value.
 func (s *Server) loadServices() {
 	s.contractReaderService = services.NewContractReaderService(s.approvalRepo, s.transferRepo, s.blockchainRepo, s.myTokenRepo, s.userClient, s.publisher)
 }
 
 // loadServer initializes the gRPC server for the Contract Reader Service.
-//
-// No parameters.
-// No return value.
 func (s *Server) loadServer() {
 	srv := grpc_server.NewGrpcServer(s.service.Cfg.ContractReaderService)
 
@@ -101,9 +101,6 @@ func (s *Server) loadServer() {
 }
 
 // Run runs the server with the provided context.
-//
-// ctx: the context.Context for the server.
-// No return value.
 func (s *Server) Run(ctx context.Context) {
 	s.service.LoadLogger()
 	s.service.LoadConfig()

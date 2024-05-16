@@ -11,11 +11,17 @@ type consumerGroupHandler struct {
 	fn    pubsub.SubscribeHandler
 }
 
+// Setup is a function that handles the setup process for the consumer group handler.
+//
+// It takes a sarama.ConsumerGroupSession as a parameter and returns an error.
 func (h *consumerGroupHandler) Setup(sarama.ConsumerGroupSession) error {
 	return nil
 }
 
-func (h *consumerGroupHandler) Cleanup(session sarama.ConsumerGroupSession) error {
+// Cleanup is a function that handles the cleanup process for the consumer group handler.
+//
+// It takes a sarama.ConsumerGroupSession as a parameter and returns an error.
+func (h *consumerGroupHandler) Cleanup(_ sarama.ConsumerGroupSession) error {
 	return nil
 }
 

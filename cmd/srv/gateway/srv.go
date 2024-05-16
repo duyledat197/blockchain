@@ -20,12 +20,14 @@ type Server struct {
 	service *processor.Service
 }
 
+// NewServer creates a new server instance.
 func NewServer() *Server {
 	return &Server{
 		service: processor.NewService(),
 	}
 }
 
+// loadClients initializes the user client and contract reader client for the server.
 func (s *Server) loadClients() {
 	userConn := grpc_client.NewGrpcClient(s.service.Cfg.UserService)
 	contractReaderConn := grpc_client.NewGrpcClient(s.service.Cfg.ContractReaderService)
@@ -38,6 +40,7 @@ func (s *Server) loadClients() {
 
 }
 
+// loadServer initializes the HTTP server with the necessary handlers and processors.
 func (s *Server) loadServer(ctx context.Context) {
 	srv := http_server.NewHttpServer(func(mux *runtime.ServeMux) {
 
@@ -50,6 +53,7 @@ func (s *Server) loadServer(ctx context.Context) {
 	s.service.WithProcessors(srv)
 }
 
+// Run runs the server with the provided context.
 func (s *Server) Run(ctx context.Context) {
 	s.service.LoadLogger()
 	s.service.LoadConfig()

@@ -1,6 +1,7 @@
-package main
+package blockchain_algorithm
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -33,19 +34,19 @@ func getPromptTemplate() *promptui.PromptTemplates {
 }
 
 const (
-	// FEATURE_ADD_DATA_TEXT ...
-	FEATURE_ADD_DATA_TEXT = "add data text"
-	// FEATURE_LIST_BLOCK ...
-	FEATURE_LIST_BLOCK = "list block"
-
-	FEATURE_EXIT = "exit"
+	// FeatureAddDataText represents for add data interaction
+	FeatureAddDataText = "add data text"
+	// FeatureListBlock represents for list block interaction
+	FeatureListBlock = "list block"
+	// FeatureExit represents for exit
+	FeatureExit = "exit"
 )
 
 var (
 	chooseFeature = promptui.Select{
-		Label:     "Choose feature",
-		Items:     []string{FEATURE_ADD_DATA_TEXT, FEATURE_LIST_BLOCK, FEATURE_EXIT},
-		Templates: getSelectTemplate("feature"),
+		Label:     "Choose your interaction",
+		Items:     []string{FeatureAddDataText, FeatureListBlock, FeatureExit},
+		Templates: getSelectTemplate("action"),
 	}
 
 	addData = promptui.Prompt{
@@ -57,11 +58,13 @@ var (
 	}
 )
 
-func main() {
+// Run runs the blockchain algorithm with the specified context.
+//
+// ctx: the context to run the blockchain algorithm
+func Run(_ context.Context) {
 	logger := slog.New(tint.NewHandler(os.Stdout, nil))
 
 	slog.SetDefault(logger)
-	// slog.SetLogLoggerLevel(slog.LevelDebug)
 
 	var (
 		numMiner  int
@@ -92,8 +95,9 @@ func main() {
 		if err != nil {
 			log.Fatalf("failed to select feature: %v", err)
 		}
+		isExit := false
 		switch feature {
-		case FEATURE_ADD_DATA_TEXT:
+		case FeatureAddDataText:
 			data, err := addData.Run()
 			if err != nil {
 				log.Printf("invalid data: %v", err)
@@ -104,7 +108,7 @@ func main() {
 				miner.TransactionCh <- []byte(data)
 			}
 
-		case FEATURE_LIST_BLOCK:
+		case FeatureListBlock:
 			num := rand.Intn(numMiner)
 			bc := miners[num].GetBlockChain()
 			for _, block := range bc.GetBlocks() {
@@ -117,7 +121,10 @@ func main() {
 					nonce: %d
 				`, block.Index, block.Timestamp, block.Data, block.PrevBlockHash, block.Hash, block.Nonce)
 			}
-		case FEATURE_EXIT:
+		case FeatureExit:
+			isExit = true
+		}
+		if isExit {
 			break
 		}
 	}

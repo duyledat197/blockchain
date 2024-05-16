@@ -14,9 +14,6 @@ import (
 )
 
 // GrpcServer represents a gRPC server instance.
-//
-// endpoint *config.Endpoint: the endpoint configuration.
-// Server *grpc.Server: the gRPC server.
 type GrpcServer struct {
 	endpoint     *config.Endpoint // The endpoint configuration.
 	*grpc.Server                  // The gRPC server.

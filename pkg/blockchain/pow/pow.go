@@ -16,6 +16,7 @@ const (
 
 var target *big.Int
 
+// getTarget returns the target difficulty for Proof of Work calculations.
 func getTarget() *big.Int {
 	if target != nil {
 		return target
@@ -31,21 +32,12 @@ func getTarget() *big.Int {
 //
 // It contains the block that the proof of work is being calculated for, as well as
 // the target difficulty for the proof of work.
-//
-// Fields:
-// - block: A pointer to the block for which the proof of work is being calculated.
-// - target: A pointer to the target difficulty for the proof of work.
 type ProofOfWork struct {
 	block  *block.Block
 	target *big.Int
 }
 
 // NewProofOfWork creates a new ProofOfWork object for the given block.
-//
-// Parameters:
-// - b: A pointer to the block for which the proof of work is being created.
-// Returns:
-// - *ProofOfWork: A pointer to the newly created ProofOfWork object.
 func NewProofOfWork(b *block.Block) *ProofOfWork {
 	return &ProofOfWork{
 		block:  b,
@@ -57,10 +49,6 @@ func NewProofOfWork(b *block.Block) *ProofOfWork {
 //
 // It iterates through nonce values until a hash value is found that meets the target difficulty.
 // The calculated nonce and hash value are returned.
-//
-// Returns:
-// - int64: The nonce value that resulted in a hash meeting the target difficulty.
-// - []byte: The hash value that meets the target difficulty.
 func (pow *ProofOfWork) Calculate() (int64, []byte) {
 	nonce := int64(0)
 
@@ -93,12 +81,6 @@ func (pow *ProofOfWork) ValidateBlock() bool {
 // It takes the nonce value as input and returns a byte slice containing the hash data.
 // The hash data is calculated by concatenating the previous block hash, block data, block timestamp, target bits, and nonce.
 // The hash data is then passed to the util.HashSHA256 function to calculate the SHA256 hash.
-//
-// Parameters:
-// - nonce: The nonce value used for the proof of work calculation.
-//
-// Returns:
-// - []byte: The prepared hash data for the proof of work calculation.
 func (pow *ProofOfWork) prepareHashData(nonce int64) []byte {
 	return util.HashSHA256(
 		pow.block.PrevBlockHash,
@@ -110,12 +92,6 @@ func (pow *ProofOfWork) prepareHashData(nonce int64) []byte {
 }
 
 // isNonceValid checks if the given nonce produces a hash value less than the target difficulty.
-//
-// Parameters:
-// - nonce: The nonce value to be checked.
-//
-// Returns:
-// - bool: True if the hash value is less than the target difficulty, false otherwise.
 func (pow *ProofOfWork) isNonceValid(nonce int64) bool {
 	var hashInt big.Int
 

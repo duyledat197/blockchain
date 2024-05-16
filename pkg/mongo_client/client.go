@@ -10,11 +10,13 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
+// MongoClient represents a MongoDB client.
 type MongoClient struct {
 	*mongo.Client
 	connectString string
 }
 
+// NewMongoClient creates a new MongoClient with the provided connection string.
 func NewMongoClient(connectString string) *MongoClient {
 	return &MongoClient{
 		connectString: connectString,

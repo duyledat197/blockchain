@@ -15,12 +15,14 @@ type Server struct {
 	deployContract *services.DeployContractService
 }
 
+// NewServer creates a new server instance.
 func NewServer() *Server {
 	return &Server{
 		service: *processor.NewService(),
 	}
 }
 
+// loadServer initializes the server to listen on a specified port for HTTP requests.
 func (s *Server) loadServer() {
 	port := s.service.Cfg.Frontend.Port
 	handler := http.FileServer(http.Dir("/html"))
@@ -30,6 +32,7 @@ func (s *Server) loadServer() {
 	}
 }
 
+// Run runs the server with the provided context.
 func (s *Server) Run(ctx context.Context) {
 	s.service.LoadLogger()
 	s.service.LoadConfig()

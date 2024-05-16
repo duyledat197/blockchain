@@ -10,6 +10,7 @@ type Transfer struct {
 	BlockNumber uint64 `bson:"block_number,omitempty" json:"block_number,omitempty"`
 }
 
+// TableName returns the table name for the Transfer entity.
 func (x *Transfer) TableName() string {
 	return "transfers"
 }

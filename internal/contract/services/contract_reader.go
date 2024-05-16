@@ -26,31 +26,20 @@ import (
 // ContractReaderService is responsible for reading contract data from the blockchain and the database
 // and publishing the results to a topic.
 type ContractReaderService struct {
-	// approvalRepo is the repository for approving contract proposals.
-	approvalRepo repositories.ApprovalRepository
-	// transferRepo is the repository for tracking token transfers.
-	transferRepo repositories.TransferRepository
-	// blockchainRepo is the repository for interacting with the blockchain.
+	approvalRepo   repositories.ApprovalRepository
+	transferRepo   repositories.TransferRepository
 	blockchainRepo repositories.BlockchainRepository
 
 	myTokenRepo repositories.MyTokenRepository
 
 	userClient userPb.UserServiceClient
 
-	// publisher is the publisher for publishing events.
 	publisher pubsub.Publisher
 
 	pb.UnimplementedContractReaderServiceServer
 }
 
 // NewContractReaderService initializes a new ContractReaderService with the provided approval repository, transfer repository, blockchain repository, and publisher.
-//
-// Parameters:
-// - approvalRepo: The approval repository for the ContractReaderService.
-// - transferRepo: The transfer repository for the ContractReaderService.
-// - blockchainRepo: The blockchain repository for the ContractReaderService.
-// - publisher: The publisher for the ContractReaderService.
-// Return type: pb.ContractReaderServiceServer.
 func NewContractReaderService(
 	approvalRepo repositories.ApprovalRepository,
 	transferRepo repositories.TransferRepository,
@@ -70,10 +59,6 @@ func NewContractReaderService(
 }
 
 // GetListApproval retrieves the list of approvals.
-//
-// - ctx: The context for retrieving the list of approvals.
-// - _ : The empty request parameter.
-// Return type: *pb.GetListApprovalResponse and error.
 func (s *ContractReaderService) GetListApproval(ctx context.Context, _ *emptypb.Empty) (*pb.GetListApprovalResponse, error) {
 	approvals, err := s.approvalRepo.GetList(ctx)
 	if err != nil {
@@ -90,9 +75,6 @@ func (s *ContractReaderService) GetListApproval(ctx context.Context, _ *emptypb.
 }
 
 // GetListTransfer retrieves the list of transfers.
-// - ctx: The context for retrieving the list of transfers.
-// - _ : The empty request parameter.
-// Return type: *pb.GetListTransferResponse and error.
 func (s *ContractReaderService) GetListTransfer(ctx context.Context, _ *emptypb.Empty) (*pb.GetListTransferResponse, error) {
 	transfers, err := s.transferRepo.GetList(ctx)
 	if err != nil {
@@ -107,11 +89,6 @@ func (s *ContractReaderService) GetListTransfer(ctx context.Context, _ *emptypb.
 }
 
 // RetrieveBalanceOf retrieves the balance of the specified address from the blockchain repository.
-//
-// Parameters:
-// - ctx: The context for retrieving the balance.
-// - req: The RetrieveBalanceOfRequest containing the address for which to retrieve the balance.
-// Return type: RetrieveBalanceOfResponse and error.
 func (s *ContractReaderService) RetrieveBalanceOf(ctx context.Context, _ *pb.RetrieveBalanceOfRequest) (*pb.RetrieveBalanceOfResponse, error) {
 	userCtx, ok := metadata.ExtractUserInfoFromCtx(ctx)
 	if !ok {
@@ -143,11 +120,6 @@ func (s *ContractReaderService) RetrieveBalanceOf(ctx context.Context, _ *pb.Ret
 }
 
 // RetrieveLatestBlock retrieves the latest block information.
-//
-// Parameters:
-// - ctx: The context for retrieving the latest block.
-// - _ : The empty request parameter.
-// Return type: RetrieveLatestBlockResponse and error.
 func (s *ContractReaderService) RetrieveLatestBlock(context.Context, *emptypb.Empty) (*pb.RetrieveLatestBlockResponse, error) {
 	block, err := s.blockchainRepo.RetrieveLatestBlock(context.Background())
 	if err != nil {
@@ -164,11 +136,6 @@ func (s *ContractReaderService) RetrieveLatestBlock(context.Context, *emptypb.Em
 }
 
 // SendTransaction sends a transaction based on the provided request.
-//
-// Parameters:
-// - ctx: The context for the transaction.
-// - req: The SendTransactionRequest containing transaction details.
-// Return type: SendTransactionResponse and error.
 func (s *ContractReaderService) SendTransaction(ctx context.Context, req *pb.SendTransactionRequest) (*pb.SendTransactionResponse, error) {
 	b, err := proto.Marshal(&commonPb.Transaction{
 		PrivKey: req.GetPrivKey(),
@@ -191,11 +158,6 @@ func (s *ContractReaderService) SendTransaction(ctx context.Context, req *pb.Sen
 }
 
 // SendTransactionV2 sends a transaction based on the provided request.
-//
-// Parameters:
-// - ctx: The context for the transaction.
-// - req: The SendTransactionV2Request containing transaction details.
-// Return type: SendTransactionResponse and error.
 func (s *ContractReaderService) SendTransactionV2(ctx context.Context, req *pb.SendTransactionV2Request) (*pb.SendTransactionResponse, error) {
 	userCtx, ok := metadata.ExtractUserInfoFromCtx(ctx)
 	if !ok {
@@ -233,10 +195,6 @@ func (s *ContractReaderService) SendTransactionV2(ctx context.Context, req *pb.S
 }
 
 // approvalToPb converts an Approval entity to a commonPb.Approval struct.
-//
-// Parameters:
-// - src: The Approval entity to convert.
-// Return type: *commonPb.Approval.
 func approvalToPb(src *entities.Approval) *commonPb.Approval {
 	return &commonPb.Approval{
 		Owner:       src.Owner,
@@ -248,10 +206,6 @@ func approvalToPb(src *entities.Approval) *commonPb.Approval {
 }
 
 // transferToPb converts an entities.Transfer to a commonPb.Transfer.
-//
-// Parameters:
-// - src: The source entities.Transfer to be converted.
-// Return type: *commonPb.Transfer.
 func transferToPb(src *entities.Transfer) *commonPb.Transfer {
 	return &commonPb.Transfer{
 		From:        src.From,
@@ -263,9 +217,6 @@ func transferToPb(src *entities.Transfer) *commonPb.Transfer {
 }
 
 // approvalListToPbList converts a list of Approval entities to a list of commonPb.Approval structs.
-//
-// - src: The list of Approval entities to convert.
-// Return type: []*commonPb.Approval.
 func approvalListToPbList(src []*entities.Approval) []*commonPb.Approval {
 	dst := make([]*commonPb.Approval, 0, len(src))
 	for _, v := range src {
@@ -276,17 +227,11 @@ func approvalListToPbList(src []*entities.Approval) []*commonPb.Approval {
 }
 
 // transferListToPbList converts a list of entities.Transfer to a list of commonPb.Transfer.
-//
-// Parameters:
-// - src: The source list of entities.Transfer to be converted.
-// Return type: A list of *commonPb.Transfer.
 func transferListToPbList(src []*entities.Transfer) []*commonPb.Transfer {
 	dst := make([]*commonPb.Transfer, 0, len(src))
 	for _, v := range src {
 		dst = append(dst, transferToPb(v))
 	}
-
-	slog.Info("dst len", slog.Any("length", len(dst)))
 
 	return dst
 }

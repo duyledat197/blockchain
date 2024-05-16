@@ -13,9 +13,6 @@ type User struct {
 }
 
 // TableName returns the table name for the User entity.
-//
-// No parameters.
-// Returns a string.
 func (x *User) TableName() string {
 	return "users"
 }

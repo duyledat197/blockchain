@@ -27,9 +27,6 @@ func NewDialClient(url string) IClient {
 }
 
 // Connect connects the DialClient to an Ethereum client.
-//
-// ctx - the context for the connection
-// error - returns an error if unable to connect to the Ethereum client
 func (c *DialClient) Connect(ctx context.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -45,7 +42,8 @@ func (c *DialClient) Connect(ctx context.Context) error {
 	return nil
 }
 
-func (c *DialClient) Close(ctx context.Context) error {
+// Close closes the DialClient with the provided context.
+func (c *DialClient) Close(_ context.Context) error {
 	c.Client.Close()
 
 	return nil

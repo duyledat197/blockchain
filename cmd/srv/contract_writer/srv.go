@@ -34,18 +34,21 @@ type Server struct {
 	service *processor.Service
 }
 
+// NewServer returns a new Server instance with a new service.
 func NewServer() *Server {
 	return &Server{
 		service: processor.NewService(),
 	}
 }
 
+// loadDatabases initializes the MongoDB client for the server.
 func (s *Server) loadDatabases() {
 	s.mongoClient = mongoclient.NewMongoClient(s.service.Cfg.MongoDB.Address())
 
 	s.service.WithFactories(s.mongoClient)
 }
 
+// loadEthClient initializes the Ethereum clients for the server.
 func (s *Server) loadEthClient(_ context.Context) {
 	cfg := s.service.Cfg
 
@@ -55,6 +58,7 @@ func (s *Server) loadEthClient(_ context.Context) {
 	s.service.WithFactories(s.ethClient, s.wsEthClient)
 }
 
+// loadRepositories initializes the necessary repositories for the server.
 func (s *Server) loadRepositories() {
 	s.approvalRepo = mongo.NewApprovalRepository(s.mongoClient, s.service.Cfg.MongoDB.Database)
 	s.transferRepo = mongo.NewTransferRepository(s.mongoClient, s.service.Cfg.MongoDB.Database)
@@ -62,10 +66,12 @@ func (s *Server) loadRepositories() {
 	s.blockchainRepo = eth.NewBlockchainRepository(s.ethClient)
 }
 
+// loadServices initializes the services in the server with the provided approval repository, transfer repository, MyToken repository, and blockchain repository.
 func (s *Server) loadServices() {
 	s.contractWriter = services.NewContractWriterService(s.approvalRepo, s.transferRepo, s.myTokenRepo, s.blockchainRepo)
 }
 
+// loadSubscriber initializes the subscriber for the server with the specified topics and contract writer callback.
 func (s *Server) loadSubscriber() {
 	s.subscriber = kafka.NewSubscriber(
 		os.Getenv("SERVICE"),
@@ -82,9 +88,6 @@ func (s *Server) loadSubscriber() {
 }
 
 // Run runs the server with the provided context.
-//
-// ctx: the context.Context for the server.
-// No return value.
 func (s *Server) Run(ctx context.Context) {
 	s.service.LoadLogger()
 	s.service.LoadConfig()

@@ -6,6 +6,7 @@ import (
 	"openmyth/blockchain/pkg/iface/processor"
 )
 
+// Publisher represents the interface for a publisher
 type Publisher interface {
 	processor.Factory
 

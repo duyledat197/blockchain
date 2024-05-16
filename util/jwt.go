@@ -20,14 +20,6 @@ func getSecret() string {
 }
 
 // GenerateToken generates a JWT token with the given payload and expiration time.
-//
-// Parameters:
-// - payload: The payload containing the claims for the JWT token.
-// - expirationTime: The duration for which the token should be valid.
-//
-// Returns:
-// - string: The generated JWT token.
-// - error: An error if the token generation fails.
 func GenerateToken(payload *jwt.StandardClaims, expirationTime time.Duration) (string, error) {
 	payload.ExpiresAt = time.Now().Add(expirationTime).Unix()
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)

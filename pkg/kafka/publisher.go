@@ -17,6 +17,10 @@ type publisher struct {
 	config      *sarama.Config
 }
 
+// NewPublisher creates a new publisher for Kafka messages.
+//
+// Takes a clientID string and variable number of broker addresses.
+// Returns a pubsub.Publisher.
 func NewPublisher(
 	clientID string,
 	brokerAddrs ...string,
@@ -35,7 +39,10 @@ func NewPublisher(
 	}
 }
 
-func (p *publisher) Connect(ctx context.Context) error {
+// Connect establishes a connection to the Kafka broker.
+//
+// Takes a context.Context as a parameter and returns an error.
+func (p *publisher) Connect(_ context.Context) error {
 	producer, err := sarama.NewSyncProducer(p.brokerAddrs, p.config)
 	if err != nil {
 		return fmt.Errorf("unable to create producer: %w", err)
@@ -46,10 +53,12 @@ func (p *publisher) Connect(ctx context.Context) error {
 	return nil
 }
 
-func (p *publisher) Close(ctx context.Context) error {
+// Close closes the publisher by closing the underlying producer.
+func (p *publisher) Close(_ context.Context) error {
 	return p.producer.Close()
 }
 
+// Publish sends a message to the specified topic.
 func (p *publisher) Publish(ctx context.Context, topic string, msg *pubsub.Pack) error {
 	m := &sarama.ProducerMessage{
 		Topic: topic,

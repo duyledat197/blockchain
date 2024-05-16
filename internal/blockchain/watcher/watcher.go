@@ -29,7 +29,6 @@ type defaultWatcher struct {
 }
 
 // NewWatcher creates a new Watcher instance.
-//
 // It takes a *eth.EthClient as a parameter and returns a Watcher.
 func NewWatcher(myTokenRepo repositories.MyTokenRepository, publisher pubsub.Publisher) Watcher {
 	return &defaultWatcher{
@@ -40,7 +39,6 @@ func NewWatcher(myTokenRepo repositories.MyTokenRepository, publisher pubsub.Pub
 }
 
 // Start starts the defaultWatcher.
-//
 // It takes a context.Context as a parameter and returns an error.
 func (w *defaultWatcher) Start(ctx context.Context) error {
 	if err := w.migrate(ctx); err != nil {
@@ -71,7 +69,6 @@ func (w *defaultWatcher) Start(ctx context.Context) error {
 }
 
 // Stop stops the defaultWatcher.
-//
 // It takes a context.Context as a parameter and returns an error.
 func (w *defaultWatcher) Stop(_ context.Context) error {
 	w.isRunning = false
@@ -80,7 +77,6 @@ func (w *defaultWatcher) Stop(_ context.Context) error {
 }
 
 // handleEventLog executes a watch on the given event log.
-//
 // It takes a types.Log parameter named evLog and returns an error.
 func (w *defaultWatcher) handleEventLog(evLog types.Log) {
 	if approval, err := w.myTokenRepo.ParseApproval(evLog); err == nil && approval != nil {
@@ -122,10 +118,6 @@ func (w *defaultWatcher) handleEventLog(evLog types.Log) {
 }
 
 // migrate migrates the watcher by filtering logs based on the contract address and handling each event log.
-//
-// Parameters:
-// - ctx: The context.Context object for cancellation and timeouts.
-// Return type: An error.
 func (w *defaultWatcher) migrate(ctx context.Context) error {
 	query := ethereum.FilterQuery{
 		Addresses: []common.Address{
