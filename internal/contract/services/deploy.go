@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"log/slog"
+	"math/big"
 	"os"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -14,6 +15,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	contract "openmyth/blockchain/idl/contracts"
+	"openmyth/blockchain/pkg/constants"
 	"openmyth/blockchain/pkg/eth_client"
 )
 
@@ -75,7 +77,7 @@ func (d *DeployContractService) Start(ctx context.Context) error {
 //
 // ctx: The context.Context for cancellation and timeouts.
 // Return type: An error.
-func (d *DeployContractService) Stop(ctx context.Context) error {
+func (d *DeployContractService) Stop(_ context.Context) error {
 	return nil
 }
 
@@ -91,6 +93,14 @@ func (d *DeployContractService) deployMyTokenContract(ctx context.Context) (*com
 		return nil, fmt.Errorf("failed to create transactor: %v", err)
 	}
 
+	gasPrice, err := d.client.SuggestGasPrice(context.Background())
+	if err != nil {
+		return nil, fmt.Errorf("failed to get gas price: %v", err)
+	}
+
+	txOpts.Value = big.NewInt(0)                // in wei
+	txOpts.GasLimit = constants.GasLimitDefault // in units
+	txOpts.GasPrice = gasPrice
 	contractAddr, _, _, err := contract.DeployMyToken(txOpts, d.client, "MyToken", "MTK", 18)
 	if err != nil {
 		return nil, fmt.Errorf("failed to deploy contract: %v", err)

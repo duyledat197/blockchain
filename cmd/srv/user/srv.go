@@ -2,7 +2,8 @@ package user
 
 import (
 	"context"
-	"log"
+
+	"github.com/google/uuid"
 
 	pb "openmyth/blockchain/idl/pb/user"
 	"openmyth/blockchain/internal/user-mgnt/repositories"
@@ -10,11 +11,15 @@ import (
 	"openmyth/blockchain/internal/user-mgnt/services"
 	"openmyth/blockchain/pkg/grpc_server"
 	"openmyth/blockchain/pkg/iface/processor"
+	"openmyth/blockchain/pkg/iface/pubsub"
+	"openmyth/blockchain/pkg/kafka"
 	mongoclient "openmyth/blockchain/pkg/mongo_client"
 )
 
 type Server struct {
 	mongoClient *mongoclient.MongoClient
+
+	publisher pubsub.Publisher
 
 	service *processor.Service
 
@@ -35,7 +40,6 @@ func NewServer() *Server {
 // No parameters.
 // No return value.
 func (s *Server) loadDatabases() {
-	log.Println("s.service.Cfg.MongoDB.Address()", s.service.Cfg.MongoDB.Address())
 	s.mongoClient = mongoclient.NewMongoClient(s.service.Cfg.MongoDB.Address())
 
 	s.service.WithFactories(s.mongoClient)
@@ -48,9 +52,17 @@ func (s *Server) loadDatabases() {
 func (s *Server) loadRepositories() {
 	s.userRepo = mongo.NewUserRepository(s.mongoClient, s.service.Cfg.MongoDB.Database)
 }
+
+func (s *Server) loadPublisher() {
+	clientID := uuid.NewString()
+	s.publisher = kafka.NewPublisher(clientID, s.service.Cfg.Kafka.Address())
+
+	s.service.WithFactories(s.publisher)
+}
+
 func (s *Server) loadServices() {
-	s.userService = services.NewUserService()
-	s.authService = services.NewAuthService(s.userRepo)
+	s.userService = services.NewUserService(s.userRepo)
+	s.authService = services.NewAuthService(s.userRepo, s.publisher, s.service.Cfg.PrivateKey)
 }
 
 func (s *Server) loadServer() {
@@ -68,6 +80,7 @@ func (s *Server) Run(ctx context.Context) {
 
 	s.loadDatabases()
 	s.loadRepositories()
+	s.loadPublisher()
 	s.loadServices()
 	s.loadServer()
 

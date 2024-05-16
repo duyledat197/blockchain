@@ -1,0 +1,3 @@
+frontend:
+  host: ""
+  port: "9999"

@@ -25,7 +25,7 @@ func (s *Server) loadServer() {
 	port := s.service.Cfg.Frontend.Port
 	handler := http.FileServer(http.Dir("/html"))
 	log.Printf("server listening in port: %v", port)
-	if err := http.ListenAndServe(port, handler); err != nil {
+	if err := http.ListenAndServe(s.service.Cfg.Frontend.Address(), handler); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
 }

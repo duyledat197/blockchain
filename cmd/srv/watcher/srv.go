@@ -2,7 +2,6 @@ package watcher
 
 import (
 	"context"
-	"log"
 
 	"github.com/google/uuid"
 
@@ -49,7 +48,6 @@ func (s *Server) loadPublisher() {
 //
 // It sets the myTokenRepo for the server with a new MyTokenRepository based on the ethClient, wsClient, and ContractAddress from the service configuration.
 func (s *Server) loadRepositories() {
-	log.Print("s.service.Cfg.ContractAddress", s.service.Cfg.ContractAddress)
 	s.myTokenRepo = eth.NewMyTokenRepository(s.ethClient, s.wsClient, s.service.Cfg.ContractAddress)
 }
 

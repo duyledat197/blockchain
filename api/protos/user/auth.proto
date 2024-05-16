@@ -33,6 +33,7 @@ message RegisterRequest {
 message RegisterResponse {
   string private_key = 1;
   string public_key = 2;
+  string wallet_address = 3;
 }
 
 message LoginRequest {

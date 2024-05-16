@@ -8,6 +8,10 @@ import "google/api/annotations.proto";
 import "common/common.proto";
 
 service UserService {
+  // internal rpc
+  rpc GetUserPrivateKeyByID(GetUserPrivateKeyByIDRequest)
+      returns (GetUserPrivateKeyByIDResponse);
+
   rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
     option (google.api.http) = {
       get : "/v1/users/{user_id}"
@@ -56,3 +60,9 @@ message GetListUserResponse {
 message UpdateUserRequest { common.User user = 1; }
 
 message UpdateUserResponse { bool success = 1; }
+
+message GetUserPrivateKeyByIDRequest { string user_id = 1; }
+message GetUserPrivateKeyByIDResponse {
+  string private_key = 1;
+  string nonce = 2;
+}

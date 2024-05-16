@@ -60,6 +60,10 @@ func (m *User) validate(all bool) error {
 
 	// no validation rules for Id
 
+	// no validation rules for WalletAddress
+
+	// no validation rules for Nonce
+
 	if len(errors) > 0 {
 		return UserMultiError(errors)
 	}

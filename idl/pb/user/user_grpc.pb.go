@@ -19,10 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	UserService_GetUserByID_FullMethodName = "/user.UserService/GetUserByID"
-	UserService_CreateUser_FullMethodName  = "/user.UserService/CreateUser"
-	UserService_GetList_FullMethodName     = "/user.UserService/GetList"
-	UserService_UpdateUser_FullMethodName  = "/user.UserService/UpdateUser"
+	UserService_GetUserByID_FullMethodName           = "/user.UserService/GetUserByID"
+	UserService_GetUserPrivateKeyByID_FullMethodName = "/user.UserService/GetUserPrivateKeyByID"
+	UserService_CreateUser_FullMethodName            = "/user.UserService/CreateUser"
+	UserService_GetList_FullMethodName               = "/user.UserService/GetList"
+	UserService_UpdateUser_FullMethodName            = "/user.UserService/UpdateUser"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -30,6 +31,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
 	GetUserByID(ctx context.Context, in *GetUserByIDRequest, opts ...grpc.CallOption) (*GetUserByIDResponse, error)
+	GetUserPrivateKeyByID(ctx context.Context, in *GetUserPrivateKeyByIDRequest, opts ...grpc.CallOption) (*GetUserPrivateKeyByIDResponse, error)
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
 	GetList(ctx context.Context, in *GetListUserRequest, opts ...grpc.CallOption) (*GetListUserResponse, error)
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
@@ -46,6 +48,15 @@ func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
 func (c *userServiceClient) GetUserByID(ctx context.Context, in *GetUserByIDRequest, opts ...grpc.CallOption) (*GetUserByIDResponse, error) {
 	out := new(GetUserByIDResponse)
 	err := c.cc.Invoke(ctx, UserService_GetUserByID_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetUserPrivateKeyByID(ctx context.Context, in *GetUserPrivateKeyByIDRequest, opts ...grpc.CallOption) (*GetUserPrivateKeyByIDResponse, error) {
+	out := new(GetUserPrivateKeyByIDResponse)
+	err := c.cc.Invoke(ctx, UserService_GetUserPrivateKeyByID_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -84,6 +95,7 @@ func (c *userServiceClient) UpdateUser(ctx context.Context, in *UpdateUserReques
 // for forward compatibility
 type UserServiceServer interface {
 	GetUserByID(context.Context, *GetUserByIDRequest) (*GetUserByIDResponse, error)
+	GetUserPrivateKeyByID(context.Context, *GetUserPrivateKeyByIDRequest) (*GetUserPrivateKeyByIDResponse, error)
 	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
 	GetList(context.Context, *GetListUserRequest) (*GetListUserResponse, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
@@ -96,6 +108,9 @@ type UnimplementedUserServiceServer struct {
 
 func (UnimplementedUserServiceServer) GetUserByID(context.Context, *GetUserByIDRequest) (*GetUserByIDResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserByID not implemented")
+}
+func (UnimplementedUserServiceServer) GetUserPrivateKeyByID(context.Context, *GetUserPrivateKeyByIDRequest) (*GetUserPrivateKeyByIDResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserPrivateKeyByID not implemented")
 }
 func (UnimplementedUserServiceServer) CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
@@ -133,6 +148,24 @@ func _UserService_GetUserByID_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).GetUserByID(ctx, req.(*GetUserByIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetUserPrivateKeyByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserPrivateKeyByIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetUserPrivateKeyByID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetUserPrivateKeyByID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetUserPrivateKeyByID(ctx, req.(*GetUserPrivateKeyByIDRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -201,6 +234,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserByID",
 			Handler:    _UserService_GetUserByID_Handler,
+		},
+		{
+			MethodName: "GetUserPrivateKeyByID",
+			Handler:    _UserService_GetUserPrivateKeyByID_Handler,
 		},
 		{
 			MethodName: "CreateUser",

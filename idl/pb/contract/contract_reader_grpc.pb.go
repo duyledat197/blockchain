@@ -25,6 +25,7 @@ const (
 	ContractReaderService_RetrieveLatestBlock_FullMethodName = "/contract.ContractReaderService/RetrieveLatestBlock"
 	ContractReaderService_RetrieveBalanceOf_FullMethodName   = "/contract.ContractReaderService/RetrieveBalanceOf"
 	ContractReaderService_SendTransaction_FullMethodName     = "/contract.ContractReaderService/SendTransaction"
+	ContractReaderService_SendTransactionV2_FullMethodName   = "/contract.ContractReaderService/SendTransactionV2"
 )
 
 // ContractReaderServiceClient is the client API for ContractReaderService service.
@@ -36,6 +37,7 @@ type ContractReaderServiceClient interface {
 	RetrieveLatestBlock(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*RetrieveLatestBlockResponse, error)
 	RetrieveBalanceOf(ctx context.Context, in *RetrieveBalanceOfRequest, opts ...grpc.CallOption) (*RetrieveBalanceOfResponse, error)
 	SendTransaction(ctx context.Context, in *SendTransactionRequest, opts ...grpc.CallOption) (*SendTransactionResponse, error)
+	SendTransactionV2(ctx context.Context, in *SendTransactionV2Request, opts ...grpc.CallOption) (*SendTransactionResponse, error)
 }
 
 type contractReaderServiceClient struct {
@@ -91,6 +93,15 @@ func (c *contractReaderServiceClient) SendTransaction(ctx context.Context, in *S
 	return out, nil
 }
 
+func (c *contractReaderServiceClient) SendTransactionV2(ctx context.Context, in *SendTransactionV2Request, opts ...grpc.CallOption) (*SendTransactionResponse, error) {
+	out := new(SendTransactionResponse)
+	err := c.cc.Invoke(ctx, ContractReaderService_SendTransactionV2_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ContractReaderServiceServer is the server API for ContractReaderService service.
 // All implementations must embed UnimplementedContractReaderServiceServer
 // for forward compatibility
@@ -100,6 +111,7 @@ type ContractReaderServiceServer interface {
 	RetrieveLatestBlock(context.Context, *emptypb.Empty) (*RetrieveLatestBlockResponse, error)
 	RetrieveBalanceOf(context.Context, *RetrieveBalanceOfRequest) (*RetrieveBalanceOfResponse, error)
 	SendTransaction(context.Context, *SendTransactionRequest) (*SendTransactionResponse, error)
+	SendTransactionV2(context.Context, *SendTransactionV2Request) (*SendTransactionResponse, error)
 	mustEmbedUnimplementedContractReaderServiceServer()
 }
 
@@ -121,6 +133,9 @@ func (UnimplementedContractReaderServiceServer) RetrieveBalanceOf(context.Contex
 }
 func (UnimplementedContractReaderServiceServer) SendTransaction(context.Context, *SendTransactionRequest) (*SendTransactionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendTransaction not implemented")
+}
+func (UnimplementedContractReaderServiceServer) SendTransactionV2(context.Context, *SendTransactionV2Request) (*SendTransactionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendTransactionV2 not implemented")
 }
 func (UnimplementedContractReaderServiceServer) mustEmbedUnimplementedContractReaderServiceServer() {}
 
@@ -225,6 +240,24 @@ func _ContractReaderService_SendTransaction_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ContractReaderService_SendTransactionV2_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SendTransactionV2Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContractReaderServiceServer).SendTransactionV2(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContractReaderService_SendTransactionV2_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContractReaderServiceServer).SendTransactionV2(ctx, req.(*SendTransactionV2Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ContractReaderService_ServiceDesc is the grpc.ServiceDesc for ContractReaderService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -251,6 +284,10 @@ var ContractReaderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SendTransaction",
 			Handler:    _ContractReaderService_SendTransaction_Handler,
+		},
+		{
+			MethodName: "SendTransactionV2",
+			Handler:    _ContractReaderService_SendTransactionV2_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

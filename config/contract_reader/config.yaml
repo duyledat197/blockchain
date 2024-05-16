@@ -7,6 +7,9 @@ ws_eth_client:
 contract_reader_service:
   host: ""
   port: "5002"
+user_service:
+  host: "user"
+  port: "5001"
 mongo_db:
   schema: mongodb
   host: mongodb

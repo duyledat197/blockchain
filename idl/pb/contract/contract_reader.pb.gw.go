@@ -90,23 +90,6 @@ func request_ContractReaderService_RetrieveBalanceOf_0(ctx context.Context, mars
 	var protoReq RetrieveBalanceOfRequest
 	var metadata runtime.ServerMetadata
 
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["address"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "address")
-	}
-
-	protoReq.Address, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "address", err)
-	}
-
 	msg, err := client.RetrieveBalanceOf(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
@@ -115,23 +98,6 @@ func request_ContractReaderService_RetrieveBalanceOf_0(ctx context.Context, mars
 func local_request_ContractReaderService_RetrieveBalanceOf_0(ctx context.Context, marshaler runtime.Marshaler, server ContractReaderServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq RetrieveBalanceOfRequest
 	var metadata runtime.ServerMetadata
-
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["address"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "address")
-	}
-
-	protoReq.Address, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "address", err)
-	}
 
 	msg, err := server.RetrieveBalanceOf(ctx, &protoReq)
 	return msg, metadata, err
@@ -160,6 +126,32 @@ func local_request_ContractReaderService_SendTransaction_0(ctx context.Context, 
 	}
 
 	msg, err := server.SendTransaction(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+func request_ContractReaderService_SendTransactionV2_0(ctx context.Context, marshaler runtime.Marshaler, client ContractReaderServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq SendTransactionV2Request
+	var metadata runtime.ServerMetadata
+
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := client.SendTransactionV2(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_ContractReaderService_SendTransactionV2_0(ctx context.Context, marshaler runtime.Marshaler, server ContractReaderServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq SendTransactionV2Request
+	var metadata runtime.ServerMetadata
+
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := server.SendTransactionV2(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -253,7 +245,7 @@ func RegisterContractReaderServiceHandlerServer(ctx context.Context, mux *runtim
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/contract.ContractReaderService/RetrieveBalanceOf", runtime.WithHTTPPathPattern("/v1/addresses/{address}/balances"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/contract.ContractReaderService/RetrieveBalanceOf", runtime.WithHTTPPathPattern("/v1/balances"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -278,7 +270,7 @@ func RegisterContractReaderServiceHandlerServer(ctx context.Context, mux *runtim
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/contract.ContractReaderService/SendTransaction", runtime.WithHTTPPathPattern("/v1/transactions"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/contract.ContractReaderService/SendTransaction", runtime.WithHTTPPathPattern("/v1/transfers"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -292,6 +284,31 @@ func RegisterContractReaderServiceHandlerServer(ctx context.Context, mux *runtim
 		}
 
 		forward_ContractReaderService_SendTransaction_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_ContractReaderService_SendTransactionV2_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/contract.ContractReaderService/SendTransactionV2", runtime.WithHTTPPathPattern("/v2/transfers"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_ContractReaderService_SendTransactionV2_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_ContractReaderService_SendTransactionV2_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -408,7 +425,7 @@ func RegisterContractReaderServiceHandlerClient(ctx context.Context, mux *runtim
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/contract.ContractReaderService/RetrieveBalanceOf", runtime.WithHTTPPathPattern("/v1/addresses/{address}/balances"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/contract.ContractReaderService/RetrieveBalanceOf", runtime.WithHTTPPathPattern("/v1/balances"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -430,7 +447,7 @@ func RegisterContractReaderServiceHandlerClient(ctx context.Context, mux *runtim
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/contract.ContractReaderService/SendTransaction", runtime.WithHTTPPathPattern("/v1/transactions"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/contract.ContractReaderService/SendTransaction", runtime.WithHTTPPathPattern("/v1/transfers"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -446,6 +463,28 @@ func RegisterContractReaderServiceHandlerClient(ctx context.Context, mux *runtim
 
 	})
 
+	mux.Handle("POST", pattern_ContractReaderService_SendTransactionV2_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/contract.ContractReaderService/SendTransactionV2", runtime.WithHTTPPathPattern("/v2/transfers"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_ContractReaderService_SendTransactionV2_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_ContractReaderService_SendTransactionV2_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	return nil
 }
 
@@ -456,9 +495,11 @@ var (
 
 	pattern_ContractReaderService_RetrieveLatestBlock_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "blocks", "latest"}, ""))
 
-	pattern_ContractReaderService_RetrieveBalanceOf_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"v1", "addresses", "address", "balances"}, ""))
+	pattern_ContractReaderService_RetrieveBalanceOf_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "balances"}, ""))
 
-	pattern_ContractReaderService_SendTransaction_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "transactions"}, ""))
+	pattern_ContractReaderService_SendTransaction_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "transfers"}, ""))
+
+	pattern_ContractReaderService_SendTransactionV2_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v2", "transfers"}, ""))
 )
 
 var (
@@ -471,4 +512,6 @@ var (
 	forward_ContractReaderService_RetrieveBalanceOf_0 = runtime.ForwardResponseMessage
 
 	forward_ContractReaderService_SendTransaction_0 = runtime.ForwardResponseMessage
+
+	forward_ContractReaderService_SendTransactionV2_0 = runtime.ForwardResponseMessage
 )

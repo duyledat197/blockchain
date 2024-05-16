@@ -31,14 +31,22 @@ service ContractReaderService {
   rpc RetrieveBalanceOf(RetrieveBalanceOfRequest)
       returns (RetrieveBalanceOfResponse) {
     option (google.api.http) = {
-      get : "/v1/addresses/{address}/balances"
+      get : "/v1/balances"
     };
   }
 
   rpc SendTransaction(SendTransactionRequest)
       returns (SendTransactionResponse) {
     option (google.api.http) = {
-      post : "/v1/transactions"
+      post : "/v1/transfers"
+      body : "*"
+    };
+  }
+
+  rpc SendTransactionV2(SendTransactionV2Request)
+      returns (SendTransactionResponse) {
+    option (google.api.http) = {
+      post : "/v2/transfers"
       body : "*"
     };
   }
@@ -57,8 +65,11 @@ message RetrieveLatestBlockResponse {
   int64 timestamp = 6;
 }
 
-message RetrieveBalanceOfRequest { string address = 1; }
-message RetrieveBalanceOfResponse { uint64 balance = 1; }
+message RetrieveBalanceOfRequest {}
+message RetrieveBalanceOfResponse {
+  uint64 balance = 1;
+  uint64 native_balance = 2;
+}
 
 message SendTransactionRequest {
   string priv_key = 1;
@@ -67,3 +78,9 @@ message SendTransactionRequest {
 }
 
 message SendTransactionResponse {}
+
+message SendTransactionV2Request {
+  string signature = 1;
+  string to = 2;
+  string amount = 3;
+}

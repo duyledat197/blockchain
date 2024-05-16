@@ -6,6 +6,7 @@ import (
 	"log"
 	"log/slog"
 	"math/big"
+	"time"
 
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -15,6 +16,7 @@ import (
 
 	contract "openmyth/blockchain/idl/contracts"
 	"openmyth/blockchain/internal/contract/repositories"
+	"openmyth/blockchain/pkg/constants"
 	"openmyth/blockchain/pkg/eth_client"
 )
 
@@ -28,17 +30,23 @@ type MyTokenRepo struct {
 // NewMyTokenRepository initializes a new Ethereum client.
 func NewMyTokenRepository(client eth_client.IClient, wsClient eth_client.IClient, contractAddress string) repositories.MyTokenRepository {
 	contractAddr := common.HexToAddress(contractAddress)
-	contract, err := contract.NewMyToken(contractAddr, client)
-	if err != nil {
-		log.Fatalf("unable to create ERC20 instance: %v", err)
-	}
-
 	return &MyTokenRepo{
 		client:          client,
 		wsClient:        wsClient,
 		contractAddress: contractAddr,
-		contract:        contract,
 	}
+}
+func (c *MyTokenRepo) getContract() *contract.MyToken {
+	if c.contract == nil {
+		contr, err := contract.NewMyToken(c.contractAddress, c.client)
+		if err != nil {
+			log.Fatalf("unable to create ERC20 instance: %v", err)
+		}
+
+		c.contract = contr
+	}
+
+	return c.contract
 }
 
 // Transfer sends a transaction to the specified address with the given amount.
@@ -50,36 +58,37 @@ func NewMyTokenRepository(client eth_client.IClient, wsClient eth_client.IClient
 // - amount: The amount of cryptocurrency to send in the transaction.
 // Return type: error, indicating any error that occurred during the transaction.
 func (c *MyTokenRepo) Transfer(ctx context.Context, privKey, toAdrr string, amount *big.Int) error {
-	privateKey, err := crypto.HexToECDSA(privKey)
-	if err != nil {
-		return fmt.Errorf("failed to convert private key: %v", err)
+	if err := retry(3, 1*time.Second, func() error {
+		privateKey, err := crypto.HexToECDSA(privKey)
+		if err != nil {
+			return fmt.Errorf("failed to convert private key: %v", err)
+		}
+
+		toAddress := common.HexToAddress(toAdrr)
+
+		// retrieve chainID
+		chainID, err := c.client.ChainID(ctx)
+		if err != nil {
+			return fmt.Errorf("failed to get chainID: %v", err)
+		}
+		// retrieve tx opts
+		txOpts, err := bind.NewKeyedTransactorWithChainID(privateKey, chainID)
+		if err != nil {
+			return fmt.Errorf("failed to create transactor: %v", err)
+		}
+
+		txOpts.GasLimit = constants.GasLimitDefault
+
+		tx, err := c.getContract().Transfer(txOpts, toAddress, amount)
+		if err != nil {
+			return fmt.Errorf("failed to send transaction: %v", err)
+		}
+		slog.Info("tx hash", slog.Any("tx hash", tx.Hash().Hex()))
+
+		return nil
+	}); err != nil {
+		return err
 	}
-
-	fromAddress := crypto.PubkeyToAddress(privateKey.PublicKey)
-	toAddress := common.HexToAddress(toAdrr)
-
-	tx, err := c.contract.TransferFrom(&bind.TransactOpts{
-		From: fromAddress,
-		Signer: func(a common.Address, t *types.Transaction) (*types.Transaction, error) {
-			chainID, err := c.client.ChainID(ctx)
-			if err != nil {
-				return nil, err
-			}
-
-			signedTx, err := types.SignTx(t, types.LatestSignerForChainID(chainID), privateKey)
-			if err != nil {
-				return nil, fmt.Errorf("singer:failed to sign transaction: %v", err)
-			}
-
-			return signedTx, nil
-		},
-		GasLimit: 1000000,
-	}, fromAddress, toAddress, amount)
-
-	if err != nil {
-		return fmt.Errorf("failed to send transaction: %v", err)
-	}
-	slog.Info("tx hash", slog.Any("tx hash", tx.Hash().Hex()))
 
 	return nil
 }
@@ -118,7 +127,7 @@ func (c *MyTokenRepo) FilterLogs(ctx context.Context, q ethereum.FilterQuery) ([
 // - log: The log to be parsed.
 // Return type: *contract.MyTokenApproval, error
 func (c *MyTokenRepo) ParseApproval(log types.Log) (*contract.MyTokenApproval, error) {
-	return c.contract.ParseApproval(log)
+	return c.getContract().ParseApproval(log)
 }
 
 // ParseTransfer parses the transfer log and returns the parsed MyTokenTransfer struct and an error if any.
@@ -127,5 +136,14 @@ func (c *MyTokenRepo) ParseApproval(log types.Log) (*contract.MyTokenApproval, e
 // - log: The log to be parsed.
 // Return type: *contract.MyTokenTransfer, error
 func (c *MyTokenRepo) ParseTransfer(log types.Log) (*contract.MyTokenTransfer, error) {
-	return c.contract.ParseTransfer(log)
+	return c.getContract().ParseTransfer(log)
+}
+
+// BalanceOf retrieves the balance of the specified address.
+//
+// Parameters:
+// - addr: The address for which the balance is retrieved.
+// Return type: (*big.Int, error)
+func (c *MyTokenRepo) BalanceOf(addr common.Address) (*big.Int, error) {
+	return c.getContract().BalanceOf(&bind.CallOpts{}, addr)
 }

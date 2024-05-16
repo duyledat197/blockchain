@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log/slog"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/log"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -13,10 +14,13 @@ import (
 
 	commonPb "openmyth/blockchain/idl/pb/common"
 	pb "openmyth/blockchain/idl/pb/contract"
+	userPb "openmyth/blockchain/idl/pb/user"
 	"openmyth/blockchain/internal/contract/entities"
 	"openmyth/blockchain/internal/contract/repositories"
 	"openmyth/blockchain/pkg/iface/pubsub"
+	"openmyth/blockchain/pkg/metadata"
 	"openmyth/blockchain/pkg/xerror"
+	"openmyth/blockchain/util/eth_util"
 )
 
 // ContractReaderService is responsible for reading contract data from the blockchain and the database
@@ -28,6 +32,11 @@ type ContractReaderService struct {
 	transferRepo repositories.TransferRepository
 	// blockchainRepo is the repository for interacting with the blockchain.
 	blockchainRepo repositories.BlockchainRepository
+
+	myTokenRepo repositories.MyTokenRepository
+
+	userClient userPb.UserServiceClient
+
 	// publisher is the publisher for publishing events.
 	publisher pubsub.Publisher
 
@@ -46,13 +55,17 @@ func NewContractReaderService(
 	approvalRepo repositories.ApprovalRepository,
 	transferRepo repositories.TransferRepository,
 	blockchainRepo repositories.BlockchainRepository,
+	myTokenRepo repositories.MyTokenRepository,
+	userClient userPb.UserServiceClient,
 	publisher pubsub.Publisher,
 ) pb.ContractReaderServiceServer {
 	return &ContractReaderService{
 		approvalRepo:   approvalRepo,
 		transferRepo:   transferRepo,
 		blockchainRepo: blockchainRepo,
+		myTokenRepo:    myTokenRepo,
 		publisher:      publisher,
+		userClient:     userClient,
 	}
 }
 
@@ -99,14 +112,33 @@ func (s *ContractReaderService) GetListTransfer(ctx context.Context, _ *emptypb.
 // - ctx: The context for retrieving the balance.
 // - req: The RetrieveBalanceOfRequest containing the address for which to retrieve the balance.
 // Return type: RetrieveBalanceOfResponse and error.
-func (s *ContractReaderService) RetrieveBalanceOf(ctx context.Context, req *pb.RetrieveBalanceOfRequest) (*pb.RetrieveBalanceOfResponse, error) {
-	balance, err := s.blockchainRepo.RetrieveBalanceOf(ctx, req.GetAddress())
+func (s *ContractReaderService) RetrieveBalanceOf(ctx context.Context, _ *pb.RetrieveBalanceOfRequest) (*pb.RetrieveBalanceOfResponse, error) {
+	userCtx, ok := metadata.ExtractUserInfoFromCtx(ctx)
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
+	}
+	u, err := s.userClient.GetUserByID(ctx, &userPb.GetUserByIDRequest{
+		UserId: userCtx.UserID,
+	})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "unable to get user: %v", err)
+	}
+
+	walletAddress := u.GetData().GetWalletAddress()
+	addr := common.HexToAddress(walletAddress)
+	nativeBalance, err := s.blockchainRepo.RetrieveBalanceOf(ctx, addr)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "unable to retrieve balance: %v", err)
+	}
+
+	balance, err := s.myTokenRepo.BalanceOf(addr)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "unable to retrieve balance: %v", err)
 	}
 
 	return &pb.RetrieveBalanceOfResponse{
-		Balance: balance,
+		NativeBalance: nativeBalance,
+		Balance:       balance.Uint64(),
 	}, nil
 }
 
@@ -147,8 +179,50 @@ func (s *ContractReaderService) SendTransaction(ctx context.Context, req *pb.Sen
 		return nil, status.Errorf(codes.Internal, "unable to marshal transaction: %v", err)
 	}
 
-	if err := s.publisher.Publish(ctx, commonPb.TopicEvent_TOPIC_EVENT_SEND_TRANSACTION.String(), &pubsub.Pack{
+	if err := s.publisher.Publish(ctx, commonPb.TopicEvent_TOPIC_EVENT_SEND_MY_TOKEN_TRANSACTION.String(), &pubsub.Pack{
 		Key: []byte(req.GetPrivKey()),
+		Msg: b,
+	}); err != nil {
+		log.Error("unable to send transaction", slog.Any("err", err))
+		return nil, status.Errorf(codes.Internal, "unable to send transaction: %v", err)
+	}
+
+	return &pb.SendTransactionResponse{}, nil
+}
+
+// SendTransactionV2 sends a transaction based on the provided request.
+//
+// Parameters:
+// - ctx: The context for the transaction.
+// - req: The SendTransactionV2Request containing transaction details.
+// Return type: SendTransactionResponse and error.
+func (s *ContractReaderService) SendTransactionV2(ctx context.Context, req *pb.SendTransactionV2Request) (*pb.SendTransactionResponse, error) {
+	userCtx, ok := metadata.ExtractUserInfoFromCtx(ctx)
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
+	}
+	resp, err := s.userClient.GetUserPrivateKeyByID(ctx, &userPb.GetUserPrivateKeyByIDRequest{
+		UserId: userCtx.UserID,
+	})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "unable to get user: %v", err)
+	}
+
+	if !eth_util.VerifySignature(resp.GetPrivateKey(), req.GetSignature(), resp.GetNonce()) {
+		return nil, status.Errorf(codes.InvalidArgument, "signature is not valid")
+	}
+
+	b, err := proto.Marshal(&commonPb.Transaction{
+		PrivKey: resp.GetPrivateKey(),
+		To:      req.GetTo(),
+		Amount:  req.Amount,
+	})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "unable to marshal transaction: %v", err)
+	}
+
+	if err := s.publisher.Publish(ctx, commonPb.TopicEvent_TOPIC_EVENT_SEND_MY_TOKEN_TRANSACTION.String(), &pubsub.Pack{
+		Key: []byte(userCtx.UserID),
 		Msg: b,
 	}); err != nil {
 		log.Error("unable to send transaction", slog.Any("err", err))

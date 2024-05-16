@@ -18,4 +18,5 @@ type MyTokenRepository interface {
 	FilterLogs(ctx context.Context, q ethereum.FilterQuery) ([]types.Log, error)
 	ParseApproval(log types.Log) (*contract.MyTokenApproval, error)
 	ParseTransfer(log types.Log) (*contract.MyTokenTransfer, error)
+	BalanceOf(addr common.Address) (*big.Int, error)
 }

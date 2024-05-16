@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 	"strings"
 
@@ -12,6 +13,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	mtdt "openmyth/blockchain/pkg/metadata"
+	"openmyth/blockchain/util"
 )
 
 type middlewareFunc func(http.Handler) http.Handler
@@ -70,13 +72,24 @@ type mapMetaDataFunc func(context.Context, *http.Request) metadata.MD
 // MapMetaDataWithBearerToken ...
 func MapMetaDataWithBearerToken() mapMetaDataFunc {
 	return func(ctx context.Context, r *http.Request) metadata.MD {
-
-		md := mtdt.ImportIpToCtx(GetClientIP(r))
-		payload, ok := r.Context().Value(payloadKeys{}).(*mtdt.Payload)
-		if !ok {
-			return md
+		md := metadata.MD{}
+		authorization := r.Header.Get(Authorization)
+		log.Println("authorization", authorization)
+		if authorization != "" {
+			schema, bearerToken, ok := strings.Cut(authorization, " ")
+			if !ok || strings.ToLower(schema) != strings.ToLower(Bearer) {
+				return md
+			}
+			log.Println("zzzz")
+			payload, err := util.VerifyToken(bearerToken)
+			if err == nil {
+				md = metadata.Join(md, mtdt.ImportUserInfoToCtx(&mtdt.Payload{
+					UserID: payload.Id,
+					Ip:     GetClientIP(r),
+					Token:  bearerToken,
+				}))
+			}
 		}
-		md = metadata.Join(md, mtdt.ImportUserInfoToCtx(payload))
 
 		return md
 	}

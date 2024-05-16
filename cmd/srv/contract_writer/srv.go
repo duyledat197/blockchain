@@ -24,9 +24,10 @@ type Server struct {
 
 	subscriber pubsub.Subscriber
 
-	approvalRepo repositories.ApprovalRepository
-	transferRepo repositories.TransferRepository
-	myTokenRepo  repositories.MyTokenRepository
+	approvalRepo   repositories.ApprovalRepository
+	transferRepo   repositories.TransferRepository
+	myTokenRepo    repositories.MyTokenRepository
+	blockchainRepo repositories.BlockchainRepository
 
 	contractWriter *services.ContractWriterService
 
@@ -45,7 +46,7 @@ func (s *Server) loadDatabases() {
 	s.service.WithFactories(s.mongoClient)
 }
 
-func (s *Server) loadEthClient(ctx context.Context) {
+func (s *Server) loadEthClient(_ context.Context) {
 	cfg := s.service.Cfg
 
 	s.ethClient = eth_client.NewDialClient(cfg.ETHClient.Address())
@@ -57,11 +58,12 @@ func (s *Server) loadEthClient(ctx context.Context) {
 func (s *Server) loadRepositories() {
 	s.approvalRepo = mongo.NewApprovalRepository(s.mongoClient, s.service.Cfg.MongoDB.Database)
 	s.transferRepo = mongo.NewTransferRepository(s.mongoClient, s.service.Cfg.MongoDB.Database)
-	s.myTokenRepo = eth.NewMyTokenRepository(s.ethClient, s.wsEthClient, s.service.Cfg.PrivateKey)
+	s.myTokenRepo = eth.NewMyTokenRepository(s.ethClient, s.wsEthClient, s.service.Cfg.ContractAddress)
+	s.blockchainRepo = eth.NewBlockchainRepository(s.ethClient)
 }
 
 func (s *Server) loadServices() {
-	s.contractWriter = services.NewContractWriterService(s.approvalRepo, s.transferRepo, s.myTokenRepo)
+	s.contractWriter = services.NewContractWriterService(s.approvalRepo, s.transferRepo, s.myTokenRepo, s.blockchainRepo)
 }
 
 func (s *Server) loadSubscriber() {
@@ -71,13 +73,18 @@ func (s *Server) loadSubscriber() {
 		[]string{
 			pb.TopicEvent_TOPIC_EVENT_APPROVAL.String(),
 			pb.TopicEvent_TOPIC_EVENT_TRANSFER.String(),
-			pb.TopicEvent_TOPIC_EVENT_SEND_TRANSACTION.String(),
+			pb.TopicEvent_TOPIC_EVENT_SEND_MY_TOKEN_TRANSACTION.String(),
+			pb.TopicEvent_TOPIC_EVENT_SEND_NATIVE_TOKEN_TRANSACTION.String(),
 		}, s.contractWriter.Subscribe,
 	)
 
 	s.service.WithProcessors(s.subscriber)
 }
 
+// Run runs the server with the provided context.
+//
+// ctx: the context.Context for the server.
+// No return value.
 func (s *Server) Run(ctx context.Context) {
 	s.service.LoadLogger()
 	s.service.LoadConfig()

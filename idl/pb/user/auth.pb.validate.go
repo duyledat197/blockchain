@@ -194,6 +194,8 @@ func (m *RegisterResponse) validate(all bool) error {
 
 	// no validation rules for PublicKey
 
+	// no validation rules for WalletAddress
+
 	if len(errors) > 0 {
 		return RegisterResponseMultiError(errors)
 	}

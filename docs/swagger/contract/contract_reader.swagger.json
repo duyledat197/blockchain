@@ -16,14 +16,14 @@
     "application/json"
   ],
   "paths": {
-    "/v1/addresses/{address}/balances": {
+    "/v1/approvals": {
       "get": {
-        "operationId": "ContractReaderService_RetrieveBalanceOf",
+        "operationId": "ContractReaderService_GetListApproval",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/contractRetrieveBalanceOfResponse"
+              "$ref": "#/definitions/contractGetListApprovalResponse"
             }
           },
           "default": {
@@ -33,27 +33,19 @@
             }
           }
         },
-        "parameters": [
-          {
-            "name": "address",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
         "tags": [
           "ContractReaderService"
         ]
       }
     },
-    "/v1/approvals": {
+    "/v1/balances": {
       "get": {
-        "operationId": "ContractReaderService_GetListApproval",
+        "operationId": "ContractReaderService_RetrieveBalanceOf",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/contractGetListApprovalResponse"
+              "$ref": "#/definitions/contractRetrieveBalanceOfResponse"
             }
           },
           "default": {
@@ -90,7 +82,27 @@
         ]
       }
     },
-    "/v1/transactions": {
+    "/v1/transfers": {
+      "get": {
+        "operationId": "ContractReaderService_GetListTransfer",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/contractGetListTransferResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "ContractReaderService"
+        ]
+      },
       "post": {
         "operationId": "ContractReaderService_SendTransaction",
         "responses": {
@@ -122,14 +134,14 @@
         ]
       }
     },
-    "/v1/transfers": {
-      "get": {
-        "operationId": "ContractReaderService_GetListTransfer",
+    "/v2/transfers": {
+      "post": {
+        "operationId": "ContractReaderService_SendTransactionV2",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/contractGetListTransferResponse"
+              "$ref": "#/definitions/contractSendTransactionResponse"
             }
           },
           "default": {
@@ -139,6 +151,16 @@
             }
           }
         },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/contractSendTransactionV2Request"
+            }
+          }
+        ],
         "tags": [
           "ContractReaderService"
         ]
@@ -220,6 +242,10 @@
         "balance": {
           "type": "string",
           "format": "uint64"
+        },
+        "nativeBalance": {
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -267,6 +293,20 @@
     },
     "contractSendTransactionResponse": {
       "type": "object"
+    },
+    "contractSendTransactionV2Request": {
+      "type": "object",
+      "properties": {
+        "signature": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "string"
+        }
+      }
     },
     "protobufAny": {
       "type": "object",

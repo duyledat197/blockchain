@@ -12,7 +12,7 @@ services:
     #   - user
     #   - contract_reader
     volumes:
-      - "../config/gateway:/app/config"
+      - "../config/frontend:/app/config"
       - "../config/common:/app/common"
       - "../html:/html"
 
@@ -30,7 +30,7 @@ services:
     volumes:
       - "../config/gateway:/app/config"
       - "../config/common:/app/common"
-      - "../html:/html"
+
   # user service
   user:
     image: openmyth/blockchain

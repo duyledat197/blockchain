@@ -6,3 +6,6 @@ mongo_db:
   host: mongodb
   port: "27017"
   database: user
+kafka:
+  host: kafka
+  port: "9092"

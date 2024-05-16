@@ -7,12 +7,16 @@ enum TopicEvent {
   TOPIC_EVENT_NONE = 0;
   TOPIC_EVENT_APPROVAL = 1;
   TOPIC_EVENT_TRANSFER = 2;
-  TOPIC_EVENT_SEND_TRANSACTION = 3;
+  TOPIC_EVENT_SEND_MY_TOKEN_TRANSACTION = 3;
+  TOPIC_EVENT_SEND_NATIVE_TOKEN_TRANSACTION = 4;
 }
 
 message User {
   string username = 1;
   string id = 2;
+
+  string wallet_address = 3;
+  string nonce = 4;
 }
 
 message Approval {

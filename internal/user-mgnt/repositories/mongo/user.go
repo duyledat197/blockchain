@@ -48,7 +48,7 @@ func (r *userRepository) Create(ctx context.Context, data *entities.User) error 
 		return err
 	}
 	id := res.InsertedID
-	data.ID = id.(primitive.ObjectID).Hex()
+	data.ID = id.(primitive.ObjectID)
 
 	return nil
 }
@@ -61,9 +61,9 @@ func (r *userRepository) Create(ctx context.Context, data *entities.User) error 
 // returns the error.
 func (r *userRepository) FindUser(ctx context.Context, id string) (*entities.User, error) {
 	var result entities.User
-
+	oID, _ := primitive.ObjectIDFromHex(id)
 	if err := r.getCollection().FindOne(ctx, &entities.User{
-		ID: id,
+		ID: oID,
 	}).Decode(&result); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, xerror.ErrNotFound

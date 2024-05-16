@@ -983,3 +983,215 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = UpdateUserResponseValidationError{}
+
+// Validate checks the field values on GetUserPrivateKeyByIDRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetUserPrivateKeyByIDRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetUserPrivateKeyByIDRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetUserPrivateKeyByIDRequestMultiError, or nil if none found.
+func (m *GetUserPrivateKeyByIDRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetUserPrivateKeyByIDRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for UserId
+
+	if len(errors) > 0 {
+		return GetUserPrivateKeyByIDRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetUserPrivateKeyByIDRequestMultiError is an error wrapping multiple
+// validation errors returned by GetUserPrivateKeyByIDRequest.ValidateAll() if
+// the designated constraints aren't met.
+type GetUserPrivateKeyByIDRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetUserPrivateKeyByIDRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetUserPrivateKeyByIDRequestMultiError) AllErrors() []error { return m }
+
+// GetUserPrivateKeyByIDRequestValidationError is the validation error returned
+// by GetUserPrivateKeyByIDRequest.Validate if the designated constraints
+// aren't met.
+type GetUserPrivateKeyByIDRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetUserPrivateKeyByIDRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetUserPrivateKeyByIDRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetUserPrivateKeyByIDRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetUserPrivateKeyByIDRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetUserPrivateKeyByIDRequestValidationError) ErrorName() string {
+	return "GetUserPrivateKeyByIDRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetUserPrivateKeyByIDRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetUserPrivateKeyByIDRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetUserPrivateKeyByIDRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetUserPrivateKeyByIDRequestValidationError{}
+
+// Validate checks the field values on GetUserPrivateKeyByIDResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetUserPrivateKeyByIDResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetUserPrivateKeyByIDResponse with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// GetUserPrivateKeyByIDResponseMultiError, or nil if none found.
+func (m *GetUserPrivateKeyByIDResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetUserPrivateKeyByIDResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for PrivateKey
+
+	// no validation rules for Nonce
+
+	if len(errors) > 0 {
+		return GetUserPrivateKeyByIDResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetUserPrivateKeyByIDResponseMultiError is an error wrapping multiple
+// validation errors returned by GetUserPrivateKeyByIDResponse.ValidateAll()
+// if the designated constraints aren't met.
+type GetUserPrivateKeyByIDResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetUserPrivateKeyByIDResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetUserPrivateKeyByIDResponseMultiError) AllErrors() []error { return m }
+
+// GetUserPrivateKeyByIDResponseValidationError is the validation error
+// returned by GetUserPrivateKeyByIDResponse.Validate if the designated
+// constraints aren't met.
+type GetUserPrivateKeyByIDResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetUserPrivateKeyByIDResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetUserPrivateKeyByIDResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetUserPrivateKeyByIDResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetUserPrivateKeyByIDResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetUserPrivateKeyByIDResponseValidationError) ErrorName() string {
+	return "GetUserPrivateKeyByIDResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetUserPrivateKeyByIDResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetUserPrivateKeyByIDResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetUserPrivateKeyByIDResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetUserPrivateKeyByIDResponseValidationError{}

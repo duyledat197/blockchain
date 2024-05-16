@@ -154,6 +154,12 @@
         },
         "id": {
           "type": "string"
+        },
+        "walletAddress": {
+          "type": "string"
+        },
+        "nonce": {
+          "type": "string"
         }
       }
     },
@@ -222,6 +228,17 @@
       "properties": {
         "data": {
           "$ref": "#/definitions/commonUser"
+        }
+      }
+    },
+    "userGetUserPrivateKeyByIDResponse": {
+      "type": "object",
+      "properties": {
+        "privateKey": {
+          "type": "string"
+        },
+        "nonce": {
+          "type": "string"
         }
       }
     },

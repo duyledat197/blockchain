@@ -48,6 +48,7 @@ func ImportUserInfoToCtx(payload *Payload) metadata.MD {
 	md.Append(MDUserNameKey, payload.UserName)
 	md.Append(MDTokenKey, payload.Token)
 	md.Append(MDRoleKey, payload.Role)
+	md.Append(MDIpKey, payload.Ip)
 
 	return md
 }

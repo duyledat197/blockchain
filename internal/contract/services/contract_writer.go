@@ -6,6 +6,8 @@ import (
 	"math/big"
 	"time"
 
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
 	"google.golang.org/protobuf/proto"
 
 	pb "openmyth/blockchain/idl/pb/common"
@@ -21,9 +23,10 @@ import (
 // - transferRepo: The transfer repository used by the ContractWriterService.
 // - myTokenRepo: The MyToken repository used by the ContractWriterService.
 type ContractWriterService struct {
-	approvalRepo repositories.ApprovalRepository
-	transferRepo repositories.TransferRepository
-	myTokenRepo  repositories.MyTokenRepository
+	approvalRepo   repositories.ApprovalRepository
+	transferRepo   repositories.TransferRepository
+	myTokenRepo    repositories.MyTokenRepository
+	blockchainRepo repositories.BlockchainRepository
 }
 
 // NewContractWriterService initializes a new ContractWriterService with the provided approval repository, transfer repository, and MyToken repository.
@@ -37,11 +40,13 @@ func NewContractWriterService(
 	approvalRepo repositories.ApprovalRepository,
 	transferRepo repositories.TransferRepository,
 	myTokenRepo repositories.MyTokenRepository,
+	blockchainRepo repositories.BlockchainRepository,
 ) *ContractWriterService {
 	return &ContractWriterService{
-		approvalRepo: approvalRepo,
-		transferRepo: transferRepo,
-		myTokenRepo:  myTokenRepo,
+		approvalRepo:   approvalRepo,
+		transferRepo:   transferRepo,
+		myTokenRepo:    myTokenRepo,
+		blockchainRepo: blockchainRepo,
 	}
 }
 
@@ -58,8 +63,10 @@ func (s *ContractWriterService) Subscribe(ctx context.Context, topic string, msg
 		s.handleApprovalEvent(ctx, msg, tt)
 	case pb.TopicEvent_TOPIC_EVENT_TRANSFER.String():
 		s.handleTransferEvent(ctx, msg, tt)
-	case pb.TopicEvent_TOPIC_EVENT_SEND_TRANSACTION.String():
-		s.handleSendTransactionEvent(ctx, msg, tt)
+	case pb.TopicEvent_TOPIC_EVENT_SEND_MY_TOKEN_TRANSACTION.String():
+		s.handleSendMyTokenTransactionEvent(ctx, msg, tt)
+	case pb.TopicEvent_TOPIC_EVENT_SEND_NATIVE_TOKEN_TRANSACTION.String():
+		s.handleSendNativeTokenTransactionEvent(ctx, msg, tt)
 	}
 }
 
@@ -112,13 +119,13 @@ func (s *ContractWriterService) handleTransferEvent(ctx context.Context, msg *pu
 	}
 }
 
-// handleSendTransactionEvent handles the sending of a transaction event.
+// handleSendMyTokenTransactionEvent handles the sending of a transaction event.
 //
 // Parameters:
 // - ctx: The context for the transaction.
 // - msg: The message containing the transaction details.
 // Return type: None.
-func (s *ContractWriterService) handleSendTransactionEvent(ctx context.Context, msg *pubsub.Pack, _ time.Time) {
+func (s *ContractWriterService) handleSendMyTokenTransactionEvent(ctx context.Context, msg *pubsub.Pack, _ time.Time) {
 	var tx pb.Transaction
 	if err := proto.Unmarshal(msg.Msg, &tx); err != nil {
 		slog.Error("failed to unmarshal tx", slog.Any("err", err))
@@ -134,4 +141,37 @@ func (s *ContractWriterService) handleSendTransactionEvent(ctx context.Context, 
 	if err := s.myTokenRepo.Transfer(ctx, tx.PrivKey, tx.To, amount); err != nil {
 		slog.Error("failed to dispatch tx", slog.Any("err", err))
 	}
+}
+
+// handleSendNativeTokenTransactionEvent handles the sending of a native token transaction event.
+//
+// Parameters:
+// - ctx: The context for the transaction.
+// - msg: The message containing the transaction details.
+// - _: The timestamp for the transaction event (unused).
+// Return type: None.
+func (s *ContractWriterService) handleSendNativeTokenTransactionEvent(ctx context.Context, msg *pubsub.Pack, _ time.Time) {
+	var tx pb.Transaction
+	if err := proto.Unmarshal(msg.Msg, &tx); err != nil {
+		slog.Error("failed to unmarshal tx", slog.Any("err", err))
+		return
+	}
+	privateKey, err := crypto.HexToECDSA(tx.PrivKey)
+	if err != nil {
+		slog.Error("failed to convert private key", slog.Any("err", err))
+		return
+	}
+
+	fromAddress := crypto.PubkeyToAddress(privateKey.PublicKey)
+	toAddress := common.HexToAddress(tx.To)
+	amount := new(big.Int)
+	if _, ok := amount.SetString(tx.Amount, 10); !ok {
+		slog.Error("amount is not valid", slog.String("amount", tx.Amount))
+		return
+	}
+	if err := s.blockchainRepo.SendTransaction(ctx, privateKey, fromAddress, toAddress, amount); err != nil {
+		slog.Error("failed to dispatch tx", slog.Any("err", err))
+	}
+
+	slog.Info("send tx success")
 }

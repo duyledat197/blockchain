@@ -6,11 +6,13 @@ import (
 	"github.com/google/uuid"
 
 	pb "openmyth/blockchain/idl/pb/contract"
+	userPb "openmyth/blockchain/idl/pb/user"
 	"openmyth/blockchain/internal/contract/repositories"
 	"openmyth/blockchain/internal/contract/repositories/eth"
 	"openmyth/blockchain/internal/contract/repositories/mongo"
 	"openmyth/blockchain/internal/contract/services"
 	"openmyth/blockchain/pkg/eth_client"
+	"openmyth/blockchain/pkg/grpc_client"
 	"openmyth/blockchain/pkg/grpc_server"
 	"openmyth/blockchain/pkg/iface/processor"
 	"openmyth/blockchain/pkg/iface/pubsub"
@@ -26,6 +28,9 @@ type Server struct {
 	approvalRepo   repositories.ApprovalRepository
 	transferRepo   repositories.TransferRepository
 	blockchainRepo repositories.BlockchainRepository
+	myTokenRepo    repositories.MyTokenRepository
+
+	userClient userPb.UserServiceClient
 
 	contractReaderService pb.ContractReaderServiceServer
 
@@ -36,6 +41,15 @@ func NewServer() *Server {
 	return &Server{
 		service: processor.NewService(),
 	}
+}
+
+func (s *Server) loadClients() {
+	userConn := grpc_client.NewGrpcClient(s.service.Cfg.UserService)
+
+	s.userClient = userPb.NewUserServiceClient(userConn)
+
+	s.service.WithFactories(userConn) // contractReaderConn,
+
 }
 
 func (s *Server) loadDatabases() {
@@ -63,6 +77,7 @@ func (s *Server) loadRepositories() {
 	s.approvalRepo = mongo.NewApprovalRepository(s.mongoClient, s.service.Cfg.MongoDB.Database)
 	s.transferRepo = mongo.NewTransferRepository(s.mongoClient, s.service.Cfg.MongoDB.Database)
 	s.blockchainRepo = eth.NewBlockchainRepository(s.ethClient)
+	s.myTokenRepo = eth.NewMyTokenRepository(s.ethClient, s.ethClient, s.service.Cfg.ContractAddress)
 }
 
 // loadServices initializes the contract reader service with the necessary repositories and publisher.
@@ -70,7 +85,7 @@ func (s *Server) loadRepositories() {
 // No parameters.
 // No return value.
 func (s *Server) loadServices() {
-	s.contractReaderService = services.NewContractReaderService(s.approvalRepo, s.transferRepo, s.blockchainRepo, s.publisher)
+	s.contractReaderService = services.NewContractReaderService(s.approvalRepo, s.transferRepo, s.blockchainRepo, s.myTokenRepo, s.userClient, s.publisher)
 }
 
 // loadServer initializes the gRPC server for the Contract Reader Service.
@@ -95,6 +110,7 @@ func (s *Server) Run(ctx context.Context) {
 
 	s.loadDatabases()
 	s.loadEthClient(ctx)
+	s.loadClients()
 	s.loadPublisher()
 	s.loadRepositories()
 	s.loadServices()
