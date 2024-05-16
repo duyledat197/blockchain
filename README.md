@@ -83,10 +83,10 @@ The Gateway Service acts as a reverse proxy, routing client requests to the appr
 The User Management Service handles user authentication and authorization. It manages user data, registration, login, and access control, ensuring secure user interactions across the platform.
 
 ### ⭐ Contract Writer Service
-The Contract Writer Service is responsible for sending commands to the Ethereum blockchain. It facilitates the creation, deployment, and updating of smart contracts, ensuring that all write operations are executed correctly on the blockchain.
+The Contract Writer Service is responsible for sending commands to the Ethereum blockchain and updating the associated database. It facilitates the creation and updating of smart contracts, ensuring that all write operations are executed correctly on the blockchain and reflected in the database.
 
 ### ⭐ Contract Reader Service
-The Contract Reader Service retrieves data from the Ethereum blockchain. It reads smart contract states, transaction details, and other blockchain information, providing accurate and up-to-date data to other services.
+The Contract Reader Service retrieves data from both the Ethereum blockchain and the database. It reads smart contract states, transaction details, and other blockchain information, providing accurate and up-to-date data to other services. Additionally, it ensures synchronization between blockchain data and the database by updating database records as needed.
 
 ### ⭐ Watcher Service
 The Watcher Service monitors event logs from the Ethereum blockchain. It listens for specific events, triggers notifications or actions in response to these events, and ensures that the system reacts promptly to changes on the blockchain.
