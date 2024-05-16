@@ -14,6 +14,11 @@ Using this command for interact with blockchain algorithm.
 ```
 
 ## Blockchain Interaction
+First of all, run build docker image:
+```sh
+  make docker-build
+```
+
 To start all services required for your web application, including those that handle blockchain interactions, run the following command:
 
 ```sh
