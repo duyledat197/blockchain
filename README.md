@@ -52,20 +52,21 @@ This command will compile and deploy the MyToken contract to ganache network.
 After you start all services, the frontend UI already serve in http://localhost:9999 by default.
 
 ## Security Considerations:
-- [] Implement multi-factor authentication (MFA) for accessing the server and its APIs.
-- [] [RBAC](https://en.wikipedia.org/wiki/Role-based_access_control): Define and enforce roles and permissions to ensure users only have access to the functionalities they need.
-- [] Use HTTPS to encrypt data in transit between clients and the server.
-- [] Implement rate limiting to protect against DDoS attacks and abuse of API endpoints.
-- [] Implement real-time monitoring and alerting to detect and respond to suspicious activities promptly (using `prometheus`).
-- [] Secure private keys using hardware security modules (HSMs) or secure enclaves. Never hardcode private keys in the source code.
-- [] Configure firewalls to limit access to the server and protect against unauthorized access.
-- [] Perform regular backups of critical data and configuration files.
-- [] Integration tests aim to verify that different components of a system can work together correctly as a whole
+
+- [ ]  Implement multi-factor authentication (MFA) for accessing the server and its APIs.
+- [ ] [RBAC](https://en.wikipedia.org/wiki/Role-based_access_control): Define and enforce roles and permissions to ensure users only have access to the functionalities they need.
+- [ ] Use HTTPS to encrypt data in transit between clients and the server.
+- [ ]  Implement rate limiting to protect against DDoS attacks and abuse of API endpoints.
+- [ ] Implement real-time monitoring and alerting to detect and respond to suspicious activities promptly (using `prometheus`).
+- [ ] Secure private keys using hardware security modules (HSMs) or secure enclaves. Never hardcode private keys in the source code.
+- [ ] Configure firewalls to limit access to the server and protect against unauthorized access.
+- [ ] Perform regular backups of critical data and configuration files.
+- [ ] Integration tests aim to verify that different components of a system can work together correctly as a whole
 
 ## Optimization and Scalability
-- [] Implement caching strategies (e.g., Redis, Memcached) to store frequently accessed data and reduce database load.
-- [] **Horizontal Scaling** Add more instances of (**gateway**, **user**, **contract_reader**, **contract_writer** services) to distribute the load (ex: Kubernetes).
-- [] **Vertical Scaling**: Increase the resources (CPU, memory) of **watcher service** to handle more load.
+- [ ] Implement caching strategies (e.g., Redis, Memcached) to store frequently accessed data and reduce database load.
+- [ ] **Horizontal Scaling** Add more instances of (**gateway**, **user**, **contract_reader**, **contract_writer** services) to distribute the load (ex: Kubernetes).
+- [ ] **Vertical Scaling**: Increase the resources (CPU, memory) of **watcher service** to handle more load.
 
 ## Documentation
 
