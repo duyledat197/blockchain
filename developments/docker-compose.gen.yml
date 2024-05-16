@@ -27,9 +27,15 @@ services:
       - "../idl/pb:/proto_out/openmyth/blockchain/idl/pb"
     entrypoint: sh /app/gen-proto.sh
 
-  generate_mock:
-    image: vektra/mockery
+  generate_mock_internal:
+    image: vektra/mockery:latest
     working_dir: /code
     volumes:
       - "../:/code:cached"
     command: [ "--all", "--dir", "internal", "--case", "underscore" ]
+  generate_mock_pkg:
+    image: vektra/mockery:latest
+    working_dir: /code
+    volumes:
+      - "../:/code:cached"
+    command: [ "--all", "--dir", "pkg", "--case", "underscore" ]

@@ -8,7 +8,8 @@ gen-contract:
 gen-proto:
 	docker compose -f ${GEN_COMPOSE} up generate_proto
 gen-mock:
-	docker compose -f ${GEN_COMPOSE} up generate_mock
+	docker compose -f ${GEN_COMPOSE} up generate_mock_internal
+	docker compose -f ${GEN_COMPOSE} up generate_mock_pkg
 compose:
 	docker compose -f ${COMPOSE} up -d --build
 get-accounts:
@@ -29,3 +30,7 @@ test-subscriber:
 	go run tests/kafka/subscriber/main.go 
 test-mongo:
 	go run tests/mongo/main.go
+
+
+start-blockchain-algorithm:
+	go run tests/blockchain/main.go

@@ -57,7 +57,7 @@ func (s *authService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.Logi
 	}
 
 	if err := util.CheckPassword(req.GetPassword(), user.HashedPassword); err != nil {
-		return nil, status.Errorf(codes.NotFound, "user or password is wrong")
+		return nil, status.Errorf(codes.InvalidArgument, "user or password is wrong")
 	}
 
 	tkn, err := util.GenerateToken(&jwt.StandardClaims{
