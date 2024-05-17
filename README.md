@@ -105,9 +105,16 @@ The Contract Reader Service retrieves data from both the Ethereum blockchain and
 The Watcher Service monitors event logs from the Ethereum blockchain. It listens for specific events, triggers notifications or actions in response to these events, and ensures that the system reacts promptly to changes on the blockchain.
 
 ### Some Important flows
-Deploy Flow
+**Deploy Flow**:
+<br/>
+
 ![image](./docs/wiki/deploy_flow.png)
-Send Transaction Flow
+
+<br/>
+
+**Send Transaction Flow**:
+<br/>
+
 ![image](./docs/wiki/send_transaction_flow.png)
 
 ### Structure folder:
