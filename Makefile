@@ -8,8 +8,7 @@ gen-contract:
 gen-proto:
 	docker compose -f ${GEN_COMPOSE} up generate_proto
 gen-mock:
-	docker compose -f ${GEN_COMPOSE} up generate_mock_internal
-	docker compose -f ${GEN_COMPOSE} up generate_mock_pkg
+	docker compose -f ${GEN_COMPOSE} up generate_mock
 compose:
 	docker compose -f ${COMPOSE} up -d --build
 get-accounts:

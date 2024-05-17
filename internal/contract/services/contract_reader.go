@@ -4,8 +4,10 @@ import (
 	"context"
 	"errors"
 	"log/slog"
+	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/log"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -163,6 +165,9 @@ func (s *ContractReaderService) SendTransactionV2(ctx context.Context, req *pb.S
 	if !ok {
 		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
+	if userCtx.UserID == "" {
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
+	}
 	resp, err := s.userClient.GetUserPrivateKeyByID(ctx, &userPb.GetUserPrivateKeyByIDRequest{
 		UserId: userCtx.UserID,
 	})
@@ -172,6 +177,24 @@ func (s *ContractReaderService) SendTransactionV2(ctx context.Context, req *pb.S
 
 	if !eth_util.VerifySignature(resp.GetPrivateKey(), req.GetSignature(), resp.GetNonce()) {
 		return nil, status.Errorf(codes.InvalidArgument, "signature is not valid")
+	}
+
+	privateKey, err := crypto.HexToECDSA(resp.GetPrivateKey())
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "unable to get private key: %v", err)
+	}
+	fromAddress := crypto.PubkeyToAddress(privateKey.PublicKey)
+	balance, err := s.myTokenRepo.BalanceOf(fromAddress)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "unable to get balance: %v", err)
+	}
+	var amount big.Int
+	if _, ok := amount.SetString(req.Amount, 10); !ok {
+		return nil, status.Errorf(codes.InvalidArgument, "amount is not valid")
+	}
+
+	if balance.Cmp(&amount) < 0 {
+		return nil, status.Errorf(codes.InvalidArgument, "balance is not enough")
 	}
 
 	b, err := proto.Marshal(&commonPb.Transaction{

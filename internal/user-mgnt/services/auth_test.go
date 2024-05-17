@@ -106,7 +106,6 @@ func Test_authService_Login(t *testing.T) {
 	t.Parallel()
 	type fields struct {
 		userRepo *mocks.UserRepository
-		wg       *sync.WaitGroup
 	}
 	type args struct {
 		ctx context.Context
@@ -125,7 +124,6 @@ func Test_authService_Login(t *testing.T) {
 			name: "happy case",
 			fields: fields{
 				userRepo: mocks.NewUserRepository(t),
-				wg:       &sync.WaitGroup{},
 			},
 			args: args{
 				ctx: context.Background(),
@@ -145,7 +143,6 @@ func Test_authService_Login(t *testing.T) {
 			name: "error user not found",
 			fields: fields{
 				userRepo: mocks.NewUserRepository(t),
-				wg:       &sync.WaitGroup{},
 			},
 			args: args{
 				ctx: context.Background(),
@@ -163,7 +160,6 @@ func Test_authService_Login(t *testing.T) {
 			name: "error wrong password",
 			fields: fields{
 				userRepo: mocks.NewUserRepository(t),
-				wg:       &sync.WaitGroup{},
 			},
 			args: args{
 				ctx: context.Background(),
@@ -187,7 +183,6 @@ func Test_authService_Login(t *testing.T) {
 			}
 			tt.setup(tt.fields)
 			_, err := s.Login(tt.args.ctx, tt.args.req)
-			tt.fields.wg.Wait()
 			if tt.wantErr != nil {
 				require.NotNil(t, err)
 				require.Equal(t, tt.wantErr.Error(), err.Error())
