@@ -70,7 +70,7 @@ func TestContractReaderService_SendTransactionV2(t *testing.T) {
 			},
 		},
 		{
-			name: "error unauthen ticated",
+			name: "error unauthenticated",
 			args: args{
 				ctx: context.Background(),
 				req: &pb.SendTransactionV2Request{
@@ -85,6 +85,25 @@ func TestContractReaderService_SendTransactionV2(t *testing.T) {
 				userClient:  mocks.NewUserServiceClient(t),
 			},
 			wantErr: status.Errorf(codes.Unauthenticated, "unauthenticated"),
+			setup: func(fields fields) {
+			},
+		},
+		{
+			name: "error amount is not valid",
+			args: args{
+				ctx: ctx,
+				req: &pb.SendTransactionV2Request{
+					Signature: "0xc83d417a3b99535e784a72af0d9772c019c776aa0dfe4313c001a5548f6cf254477f5334c30da59531bb521278edc98f1959009253dda4ee9f63fe5562ead5aa1b",
+					To:        "0x0d3d7a5d1a8fa8e7b8a6d1b9c8c7a9d7e7b8a6d1b9c8c7a9d7e7b8a6d1b9c8c7a9d7e",
+					Amount:    "0.1",
+				},
+			},
+			fields: fields{
+				myTokenRepo: mocks.NewMyTokenRepository(t),
+				publisher:   mocks.NewPublisher(t),
+				userClient:  mocks.NewUserServiceClient(t),
+			},
+			wantErr: status.Errorf(codes.InvalidArgument, "amount is not valid"),
 			setup: func(fields fields) {
 			},
 		},

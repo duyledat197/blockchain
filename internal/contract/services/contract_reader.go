@@ -168,6 +168,12 @@ func (s *ContractReaderService) SendTransactionV2(ctx context.Context, req *pb.S
 	if userCtx.UserID == "" {
 		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
+
+	var amount big.Int
+	if _, ok := amount.SetString(req.Amount, 10); !ok {
+		return nil, status.Errorf(codes.InvalidArgument, "amount is not valid")
+	}
+
 	resp, err := s.userClient.GetUserPrivateKeyByID(ctx, &userPb.GetUserPrivateKeyByIDRequest{
 		UserId: userCtx.UserID,
 	})
@@ -187,10 +193,6 @@ func (s *ContractReaderService) SendTransactionV2(ctx context.Context, req *pb.S
 	balance, err := s.myTokenRepo.BalanceOf(fromAddress)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "unable to get balance: %v", err)
-	}
-	var amount big.Int
-	if _, ok := amount.SetString(req.Amount, 10); !ok {
-		return nil, status.Errorf(codes.InvalidArgument, "amount is not valid")
 	}
 
 	if balance.Cmp(&amount) < 0 {
