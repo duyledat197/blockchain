@@ -74,15 +74,8 @@ After you start all services, the frontend UI already serve in http://localhost:
 - [ ] **Vertical Scaling**: Increase the resources (CPU, memory) of **watcher service** to handle more load.
 
 ## Documentation
-My project is built on a cutting-edge microservice architecture, utilizing a mono-repo implementation combined with advanced patterns like CQRS, Event Sourcing, and Domain-Driven Design. This approach ensures a robust, scalable, and maintainable system capable of meeting complex business requirements efficiently.\
-**Reference docs**:
-- [Microservice](https://microservices.io/patterns/microservices.html).
-- [CQRS](https://microservices.io/patterns/data/cqrs.html).
-- [Event-sourcing](https://microservices.io/patterns/data/event-sourcing.html).
-- [Event Driven Design](https://en.wikipedia.org/wiki/Event-driven_architecture).
+My project is built on a cutting-edge microservice architecture, utilizing a mono-repo implementation combined with advanced patterns like CQRS, Event Sourcing, and Domain-Driven Design. This approach ensures a robust, scalable, and maintainable system capable of meeting complex business requirements efficiently.
 
-Structure folder I follow [Go project layout standard](https://github.com/golang-standards/project-layout). \
-Coding style I follow [Go effective](https://github.com/golang-standards/project-layout) and [Go Uber Style](https://github.com/uber-go/guide/blob/master/style.md).
 ### Architecture
 
 ![image](./docs/wiki/blockchain_architechture.png)
@@ -340,3 +333,13 @@ The Watcher Service monitors event logs from the Ethereum blockchain. It listens
 89 directories, 180 files
 ```
 
+**Reference docs**:
+- [Microservice](https://microservices.io/patterns/microservices.html).
+- [CQRS](https://microservices.io/patterns/data/cqrs.html).
+- [Event-sourcing](https://microservices.io/patterns/data/event-sourcing.html).
+- [Event Driven Design](https://en.wikipedia.org/wiki/Event-driven_architecture).
+- Structure folder [Go project layout standard](https://github.com/golang-standards/project-layout).
+- Coding style I follow [Go effective](https://github.com/golang-standards/project-layout) and [Go Uber Style](https://github.com/uber-go/guide/blob/master/style.md).
+- [MongoDB](https://www.mongodb.com/docs/).
+- [Kafka](https://kafka.apache.org/).
+- [Ganache](https://archive.trufflesuite.com/docs/ganache/).
